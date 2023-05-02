@@ -44,10 +44,9 @@ export default function SignIn({ setIsSignUp }) {
   };
 
   return (
-    <div className='w-full max-w-sm lg:max-w-md px-6 py-8 xs:p-10 bg-white shadow-neutral-200 shadow-lg border border-neutral-100 rounded-lg'>
-      <form className='flex flex-col items-center gap-6'>
-        <h1 className='text-primary text-2xl text-center font-semibold'>Account Sign In</h1>
-        {/* <input
+    <form className='space-y-6' onSubmit={handleSubmit}>
+      <h1 className='text-primary text-2xl text-center font-semibold'>Account Sign In</h1>
+      {/* <input
           id='outlined-password-input'
           label='Username or email address'
           name='identifier'
@@ -56,7 +55,7 @@ export default function SignIn({ setIsSignUp }) {
           // error={!hasEmail && true}
           // helperText={!hasEmail && 'Email address is required.'}
         /> */}
-        {/* <input
+      {/* <input
           id='outlined-basic'
           type='password'
           autoComplete='current-password'
@@ -67,41 +66,39 @@ export default function SignIn({ setIsSignUp }) {
           // error={!hasPassword && true}
           // helperText={!hasPassword && 'Password is required.'}
         /> */}
-        <input
-          type='text'
-          name='identifier'
-          placeholder='Username or email address'
-          className='border border-neutral-300 text-dark rounded-lg focus:outline-primary block w-full p-3'
-          required
-          value={credentials.identifier}
-          onChange={handleChange}
-        />
-        <input
-          type='password'
-          name='password'
-          placeholder='Password'
-          className='border border-neutral-300 text-dark rounded-lg focus:outline-primary block w-full p-3'
-          required
-          value={credentials.password}
-          onChange={handleChange}
-        />
-        <button
-          type='button'
-          className='text-white bg-primary hover:bg-primaryDark font-medium rounded-lg p-2.5 focus:outline-none w-full shadow-neutral-300 shadow-md'
-          onClick={handleSubmit}
-        >
-          Sign in
-        </button>
-        <span className='w-full block bg-neutral-300 h-[0.5px]' />
-        <button
-          type='button'
-          className='text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg p-2.5 focus:outline-none w-full shadow-neutral-300 shadow-md'
-          onClick={() => setIsSignUp(true)}
-        >
-          Sign up
-        </button>
-      </form>
-    </div>
+      <input
+        type='text'
+        name='identifier'
+        placeholder='Username or email address'
+        className='border border-neutral-300 text-dark rounded-lg focus:outline-primary block w-full p-3'
+        required
+        value={credentials.identifier}
+        onChange={handleChange}
+      />
+      <input
+        type='password'
+        name='password'
+        placeholder='Password'
+        className='border border-neutral-300 text-dark rounded-lg focus:outline-primary block w-full p-3'
+        required
+        value={credentials.password}
+        onChange={handleChange}
+      />
+      <button
+        type='button'
+        className='text-white bg-primary hover:bg-primaryDark font-medium rounded-lg p-2.5 focus:outline-none w-full shadow-neutral-300 shadow-md'
+      >
+        Sign in
+      </button>
+      <span className='w-full block bg-neutral-300 h-[0.5px]' />
+      <button
+        type='button'
+        className='text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg p-2.5 focus:outline-none w-full shadow-neutral-300 shadow-md'
+        onClick={() => setIsSignUp(true)}
+      >
+        Create new account
+      </button>
+    </form>
   );
 }
 

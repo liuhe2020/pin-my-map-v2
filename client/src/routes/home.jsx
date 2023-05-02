@@ -4,6 +4,7 @@ import SignIn from '../components/SignIn';
 import SignUp from '../components/SignUp';
 // import Loader from '../components/Loader';
 import GlobalContext from '../context/GlobalContext';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Home() {
   const { isLoading, authUser } = useContext(GlobalContext);
@@ -17,11 +18,11 @@ export default function Home() {
     <div className='flex flex-col min-h-screen px-6 md:px-10 gap-12 bg-cover'>
       <img className='w-10 mt-6' src='/img/pin_logo_s.png' alt='pin_my_map_logo' />
       <div className='flex-1 flex items-center justify-center'>
-        <div className='flex flex-col gap-16 items-center lg:flex-row lg:items-start lg:gap-20 lg:pb-32'>
-          <div className='max-w-lg text-center space-y-6 lg:text-left lg:w-2/5'>
-            <h1 className='text-5xl font-bold text-primary sm:text-5xl'>Pin My Map</h1>
-            <h2 className='text-2xl font-semibold text-dark'>Your World, Your Way.</h2>
-            <h2 className='text-dark text-lg font-medium'>
+        <div className='flex flex-col gap-16 items-center lg:flex-row lg:items-start lg:gap-20 lg:h-[575px] lg:w-[840px]'>
+          <div className='max-w-lg text-center space-y-6 lg:text-left lg:w-[360px]'>
+            <h1 className='text-4xl font-bold text-primary sm:text-5xl sm:mb-2'>Pin My Map</h1>
+            <h2 className='text-xl font-semibold text-dark sm:text-2xl'>Your World, Your Way.</h2>
+            <h2 className='text-dark font-medium text-base sm:text-lg'>
               Create a personalised map of your world. Mark your favorite spots, travel footprints and explore new places. Pin your world your way – the
               possibilities are endless.
             </h2>
@@ -32,7 +33,31 @@ export default function Home() {
               View demo
             </Link>
           </div>
-          {isSignUp ? <SignUp setIsSignUp={setIsSignUp} /> : <SignIn setIsSignUp={setIsSignUp} />}
+          <AnimatePresence mode='wait'>
+            {isSignUp ? (
+              <motion.div
+                className='max-w-sm w-full px-6 py-8 bg-white shadow-neutral-200 shadow-lg border border-neutral-100 rounded-lg xs:p-10 lg:w-[400px]'
+                key='signup'
+                initial={{ opacity: 0, y: -25 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 25 }}
+                transition={{ type: 'tween', ease: 'easeOut' }}
+              >
+                <SignUp setIsSignUp={setIsSignUp} />
+              </motion.div>
+            ) : (
+              <motion.div
+                className='max-w-sm w-full px-6 py-8 bg-white shadow-neutral-200 shadow-lg border border-neutral-100 rounded-lg xs:p-10 lg:w-[400px]'
+                key='signin'
+                initial={{ opacity: 0, y: -25 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 25 }}
+                transition={{ type: 'tween', ease: 'easeOut' }}
+              >
+                <SignIn setIsSignUp={setIsSignUp} />
+              </motion.div>
+            )}
+          </AnimatePresence>
           {isLoading && <Loader />}
         </div>
       </div>

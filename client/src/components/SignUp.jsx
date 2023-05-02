@@ -8,10 +8,7 @@ import GlobalContext from '../context/GlobalContext';
 
 export default function SignUp({ setIsSignUp }) {
   const { setAuthUser, setIsLoading } = useContext(GlobalContext);
-  const [isValidUsername, setIsValidUsername] = useState(true);
-  const [isValidEmail, setIsValidEmail] = useState(true);
-  const [isValidPassword, setIsValidPassword] = useState(true);
-  const [isValidConfirmPassword, setIsValidConfirmPassword] = useState(true);
+
   const [newUser, setNewUser] = useState({
     username: '',
     email: '',
@@ -20,11 +17,6 @@ export default function SignUp({ setIsSignUp }) {
   });
 
   const handleChange = (e) => {
-    setIsValidUsername(true);
-    setIsValidEmail(true);
-    setIsValidPassword(true);
-    setIsValidConfirmPassword(true);
-
     const { name, value } = e.target;
     setNewUser({ ...newUser, [name]: value });
   };
@@ -76,10 +68,9 @@ export default function SignUp({ setIsSignUp }) {
   };
 
   return (
-    <div className='w-full max-w-sm lg:max-w-md px-6 py-8 xs:p-10 bg-white shadow-neutral-200 shadow-lg border border-neutral-100 rounded-lg'>
-      <h1 className='text-primary text-2xl text-center'>Create New Account</h1>
-      <form className='flex flex-col items-center'>
-        <input
+    <form className='space-y-6' onSubmit={handleSubmit}>
+      <h1 className='text-primary text-2xl text-center font-semibold'>Create New Account</h1>
+      {/* <input
           id='outlined-basic-1'
           variant='outlined'
           color='warning'
@@ -124,15 +115,58 @@ export default function SignUp({ setIsSignUp }) {
           onChange={handleChange}
           error={!isValidConfirmPassword && true}
           helperText={!isValidConfirmPassword && 'Passwords do not match'}
-        />
-        <button variant='contained' color='warning' style={{ width: '100%' }} onClick={handleSubmit}>
-          Sign up
-        </button>
-        <button variant='contained' color='primary' onClick={() => setIsSignUp(false)}>
-          Back to login
-        </button>
-      </form>
-    </div>
+        /> */}
+      <input
+        type='email'
+        name='email'
+        placeholder='Email'
+        className='border border-neutral-300 text-dark rounded-lg focus:outline-primary block w-full p-3'
+        required
+        value={newUser.email}
+        onChange={handleChange}
+      />
+      <input
+        type='text'
+        name='username'
+        placeholder='Username'
+        className='border border-neutral-300 text-dark rounded-lg focus:outline-primary block w-full p-3'
+        required
+        value={newUser.username}
+        onChange={handleChange}
+      />
+      <input
+        type='password'
+        name='password'
+        placeholder='Password'
+        className='border border-neutral-300 text-dark rounded-lg focus:outline-primary block w-full p-3'
+        required
+        value={newUser.password}
+        onChange={handleChange}
+      />
+      <input
+        type='password'
+        name='confirmPassword'
+        placeholder='Confirm Password'
+        className='border border-neutral-300 text-dark rounded-lg focus:outline-primary block w-full p-3'
+        required
+        value={newUser.confirmPassword}
+        onChange={handleChange}
+      />
+      <button
+        type='button'
+        className='text-white bg-primary hover:bg-primaryDark font-medium rounded-lg p-2.5 focus:outline-none w-full shadow-neutral-300 shadow-md'
+      >
+        Sign up
+      </button>
+      <span className='w-full block bg-neutral-300 h-[0.5px]' />
+      <button
+        type='button'
+        className='text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg p-2.5 focus:outline-none w-full shadow-neutral-300 shadow-md'
+        onClick={() => setIsSignUp(false)}
+      >
+        Back to sign in
+      </button>
+    </form>
   );
 }
 
