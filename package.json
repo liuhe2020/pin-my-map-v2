@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "ps": "prisma studio",
-    "preinstall": "npx only-allow pnpm",
-    "postinstall": "prisma generate"
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
