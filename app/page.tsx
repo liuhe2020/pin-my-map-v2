@@ -9,9 +9,8 @@ export default function Home() {
           <Image src='/images/pin_logo.png' width={32} height={32} alt='pin my map logo' className='mx-auto pb-2' />
           <h1 className='text-4xl font-bold text-orange-500 sm:text-5xl'>Pin My Map</h1>
           <h2 className='text-xl font-semibold text-dark'>Your World, Your Way.</h2>
-          <h2 className='text-dark font-medium text-base text-center sm:text-left'>
-            Create a personalised map of your world. Mark your favorite spots, travel footprints and explore new places. Showcase the world in your own vision.
-            The possibilities are endless.
+          <h2 className='text-dark font-medium text-base text-center'>
+            Create a personalised map of your world. Mark your favorite spots, travel footprints and explore new places.
           </h2>
           <div className='flex flex-col gap-y-3'>
             <Link
