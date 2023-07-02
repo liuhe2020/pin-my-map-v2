@@ -8,18 +8,26 @@ import MapboxGeocoder, { GeocoderOptions } from '@mapbox/mapbox-gl-geocoder';
 type GeocoderControlProps = Omit<GeocoderOptions, 'accessToken' | 'mapboxgl' | 'marker'> & {
   mapboxAccessToken: string;
   marker?: boolean | Omit<MarkerProps, 'longitude' | 'latitude'>;
-
   position: ControlPosition;
+  onLoading?: (e: object) => void;
+  onResults?: (e: object) => void;
+  onResult?: (e: object) => void;
+  onError?: (e: object) => void;
+};
 
-  onLoading: (e: object) => void;
-  onResults: (e: object) => void;
-  onResult: (e: object) => void;
-  onError: (e: object) => void;
+const noop = () => {};
+const defaultProps = {
+  marker: true,
+  onLoading: noop,
+  onResults: noop,
+  onResult: noop,
+  onError: noop,
 };
 
 /* eslint-disable complexity,max-statements */
 export default function GeocoderControl(props: GeocoderControlProps) {
-  const [marker, setMarker] = useState<null | JSX.Element>(null);
+  const [geoMarker, setGeoMarker] = useState<JSX.Element | null>(null);
+  const { marker, onLoading, onResults, onResult, onError } = { ...defaultProps, ...props };
 
   const geocoder = useControl<MapboxGeocoder>(
     () => {
@@ -28,21 +36,21 @@ export default function GeocoderControl(props: GeocoderControlProps) {
         marker: false,
         accessToken: props.mapboxAccessToken,
       });
-      ctrl.on('loading', props.onLoading);
-      ctrl.on('results', props.onResults);
+      ctrl.on('loading', onLoading);
+      ctrl.on('results', onResults);
       ctrl.on('result', (evt) => {
-        props.onResult(evt);
+        onResult(evt);
 
         const { result } = evt;
         const location = result && (result.center || (result.geometry?.type === 'Point' && result.geometry.coordinates));
-        if (location && props.marker) {
-          const markerProps = typeof props.marker === 'object' ? props.marker : {};
-          setMarker(<Marker {...markerProps} longitude={location[0]} latitude={location[1]} />);
+        if (location && marker) {
+          const markerProps = typeof marker === 'object' ? marker : {};
+          setGeoMarker(<Marker {...markerProps} longitude={location[0]} latitude={location[1]} />);
         } else {
-          setMarker(null);
+          setGeoMarker(null);
         }
       });
-      ctrl.on('error', props.onError);
+      ctrl.on('error', onError);
       return ctrl;
     },
     {
@@ -102,15 +110,5 @@ export default function GeocoderControl(props: GeocoderControlProps) {
     //   geocoder.setWorldview(props.worldview);
     // }
   }
-  return marker;
+  return geoMarker;
 }
-
-const noop = () => {};
-
-GeocoderControl.defaultProps = {
-  marker: true,
-  onLoading: noop,
-  onResults: noop,
-  onResult: noop,
-  onError: noop,
-};
