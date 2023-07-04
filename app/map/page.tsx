@@ -33,8 +33,8 @@ export default function MapPage() {
     }
     // setWidth('w-3/4');
     setNewPin({ lat: e.lngLat.lat, long: e.lngLat.lng });
-    mapRef.current?.resize();
-    mapRef.current?.flyTo({ center: [e.lngLat.lng + 8, e.lngLat.lat] });
+    mapRef.current?.panBy([50, 0]);
+    // mapRef.current?.flyTo({ center: [e.lngLat.lng + 8, e.lngLat.lat], speed: 0.3 });
   };
 
   return (
