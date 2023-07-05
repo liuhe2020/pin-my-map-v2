@@ -9,6 +9,9 @@ import { cn } from '@/lib/utils';
 
 const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
 const ease = [[0.4, 0, 0.6, 1]];
+const interpolateValue = (value: number) => {
+  return ((value - 1.585) / (19 - 1.585)) * (0.000322 - 56.3) + 56.3;
+};
 
 export default function MapPage() {
   const [viewState, setViewState] = useState({
@@ -32,7 +35,7 @@ export default function MapPage() {
     }
     // setWidth('w-3/4');
     setNewPin({ lat: e.lngLat.lat, long: e.lngLat.lng });
-    mapRef.current?.easeTo({ center: [e.lngLat.lng + 8, e.lngLat.lat] });
+    mapRef.current?.easeTo({ center: [e.lngLat.lng, e.lngLat.lat], offset: [-240, 0] });
   };
 
   return (
@@ -65,7 +68,7 @@ export default function MapPage() {
         <motion.div
           className='absolute right-0 top-0 h-full z-10 bg-white'
           initial={{ width: 0 }}
-          animate={{ width: 384 }}
+          animate={{ width: 480 }}
           exit={{ width: 0 }}
           transition={{ duration: 0.5, ease }}
         ></motion.div>
