@@ -6,36 +6,58 @@ import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl'
 import GeocoderControl from '@/components/geocoder';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import AddPin from '@/components/addPin';
+
+type NewPin = {
+  location: string;
+  city?: string;
+  region?: string;
+  country?: string;
+  description?: string;
+  date?: Date;
+  latitude: number;
+  longitude: number;
+};
 
 const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
 const ease = [[0.4, 0, 0.6, 1]];
-const interpolateValue = (value: number) => {
-  return ((value - 1.585) / (19 - 1.585)) * (0.000322 - 56.3) + 56.3;
-};
 
 export default function MapPage() {
   const [viewState, setViewState] = useState({
     latitude: 46,
     longitude: 17,
     zoom: 4,
-    // minZoom: 1.585, // limit zoom out to single world map
-    // maxZoom: 19,
   });
 
   const mapRef = useRef<MapRef>(null);
 
-  const [newPin, setNewPin] = useState<null | { lat: number; long: number }>(null);
+  const [newPin, setNewPin] = useState<null | NewPin>(null);
 
   // create a new marker at clicked location
-  const handleMapClick = (e: MapLayerMouseEvent) => {
+  const handleMapClick = async (e: MapLayerMouseEvent) => {
     if (newPin) {
-      // setWidth('w-full');
-      setNewPin(null);
-      return;
+      return setNewPin(null);
     }
-    // setWidth('w-3/4');
-    setNewPin({ lat: e.lngLat.lat, long: e.lngLat.lng });
-    mapRef.current?.easeTo({ center: [e.lngLat.lng, e.lngLat.lat], offset: [-240, 0] });
+    const latitude = e.lngLat.lat;
+    const longitude = e.lngLat.lng;
+    const getPlace = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapBoxToken}`);
+    const place = await getPlace.json();
+    // console.log(place);
+
+    const hasPoi = place.features.find((i: { id: string | string[] }) => i.id.includes('poi'));
+    const hasNeighborhood = place.features.find((i: { id: string | string[] }) => i.id.includes('neighborhood'));
+    const hasLocality = place.features.find((i: { id: string | string[] }) => i.id.includes('locality'));
+    const hasCity = place.features.find((i: { id: string | string[] }) => i.id.includes('place'));
+    const hasRegion = place.features.find((i: { id: string | string[] }) => i.id.includes('region'));
+    const hasCountry = place.features.find((i: { id: string | string[] }) => i.id.includes('country'));
+
+    const location = hasPoi ? hasPoi.text : hasNeighborhood ? hasNeighborhood.text : hasLocality ? hasLocality.text : '';
+    const city = hasCity ? hasCity.text : '';
+    const region = hasRegion ? hasRegion.text : '';
+    const country = hasCountry ? hasCountry.text : '';
+
+    setNewPin({ latitude, longitude, location, city, region, country });
+    mapRef.current?.easeTo({ center: [longitude, latitude], offset: [-240, 0] });
   };
 
   return (
@@ -46,7 +68,7 @@ export default function MapPage() {
           {...viewState}
           onMove={(evt) => setViewState(evt.viewState)}
           mapboxAccessToken={mapBoxToken}
-          // doubleClickZoom={false}
+          doubleClickZoom={false}
           mapStyle='mapbox://styles/liuhe2020/cktu2h4q70wil17m6umh33a9i'
           minZoom={1.585} // limit zoom out to single world map
           maxZoom={19}
@@ -55,8 +77,8 @@ export default function MapPage() {
           <GeocoderControl mapboxAccessToken={mapBoxToken} position='top-left' />
           {newPin && (
             <Marker
-              latitude={newPin.lat}
-              longitude={newPin.long}
+              latitude={newPin.latitude}
+              longitude={newPin.longitude}
               offset={[0, -14]} //centering marker
             >
               <img src='/images/marker_blue.svg' alt='marker_pin' style={{ cursor: 'pointer' }} />
@@ -71,7 +93,9 @@ export default function MapPage() {
           animate={{ width: 480 }}
           exit={{ width: 0 }}
           transition={{ duration: 0.5, ease }}
-        ></motion.div>
+        >
+          <AddPin />
+        </motion.div>
       )}
     </div>
   );

@@ -59,6 +59,9 @@ model VerificationToken {
 model Pin {
   id          String    @id @default(cuid())
   location    String
+  city        String?
+  region      String?
+  country     String?
   description String?   @db.Text
   date        DateTime?
   latitude    Float
