@@ -7,17 +7,7 @@ import GeocoderControl from '@/components/geocoder';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import AddPin from '@/components/addPin';
-
-type NewPin = {
-  location: string;
-  city?: string;
-  region?: string;
-  country?: string;
-  description?: string;
-  date?: Date;
-  latitude: number;
-  longitude: number;
-};
+import type { NewPin } from '@/components/types';
 
 const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
 const ease = [[0.4, 0, 0.6, 1]];
@@ -42,19 +32,15 @@ export default function MapPage() {
     const longitude = e.lngLat.lng;
     const getPlace = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapBoxToken}`);
     const place = await getPlace.json();
-    // console.log(place);
 
-    const hasPoi = place.features.find((i: { id: string | string[] }) => i.id.includes('poi'));
-    const hasNeighborhood = place.features.find((i: { id: string | string[] }) => i.id.includes('neighborhood'));
-    const hasLocality = place.features.find((i: { id: string | string[] }) => i.id.includes('locality'));
-    const hasCity = place.features.find((i: { id: string | string[] }) => i.id.includes('place'));
-    const hasRegion = place.features.find((i: { id: string | string[] }) => i.id.includes('region'));
-    const hasCountry = place.features.find((i: { id: string | string[] }) => i.id.includes('country'));
-
-    const location = hasPoi ? hasPoi.text : hasNeighborhood ? hasNeighborhood.text : hasLocality ? hasLocality.text : '';
-    const city = hasCity ? hasCity.text : '';
-    const region = hasRegion ? hasRegion.text : '';
-    const country = hasCountry ? hasCountry.text : '';
+    const location =
+      place.features.find((i: { id: string }) => i.id.includes('poi'))?.text ||
+      place.features.find((i: { id: string }) => i.id.includes('neighborhood'))?.text ||
+      place.features.find((i: { id: string }) => i.id.includes('locality'))?.text ||
+      '';
+    const city = place.features.find((i: { id: string }) => i.id.includes('place'))?.text || '';
+    const region = place.features.find((i: { id: string }) => i.id.includes('region'))?.text || '';
+    const country = place.features.find((i: { id: string }) => i.id.includes('country'))?.text || '';
 
     setNewPin({ latitude, longitude, location, city, region, country });
     mapRef.current?.easeTo({ center: [longitude, latitude], offset: [-240, 0] });
@@ -94,7 +80,7 @@ export default function MapPage() {
           exit={{ width: 0 }}
           transition={{ duration: 0.5, ease }}
         >
-          <AddPin />
+          <AddPin newPin={newPin} />
         </motion.div>
       )}
     </div>
