@@ -72,17 +72,19 @@ export default function MapPage() {
           )}
         </Map>
       </div>
-      {newPin && (
-        <motion.div
-          className='absolute right-0 top-0 h-full z-10 bg-white'
-          initial={{ width: 0 }}
-          animate={{ width: 480 }}
-          exit={{ width: 0 }}
-          transition={{ duration: 0.5, ease }}
-        >
-          <AddPin newPin={newPin} />
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {newPin && (
+          <motion.div
+            className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120'
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ duration: 0.4, ease }}
+          >
+            <AddPin newPin={newPin} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
