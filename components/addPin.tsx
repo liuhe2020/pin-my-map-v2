@@ -15,10 +15,11 @@ import { CalendarIcon } from 'lucide-react';
 import { Calendar } from './ui/calendar';
 import { format } from 'date-fns';
 import { Textarea } from './ui/textarea';
+import { Cross2Icon } from '@radix-ui/react-icons';
 
 const formSchema = z.object({
   location: z.string().min(2, {
-    message: 'location must be at least 2 characters.',
+    message: 'Minimum 2 characters.',
   }),
   city: z.string(),
   region: z.string(),
@@ -49,9 +50,10 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
   }
 
   return (
-    <div className=''>
+    <div className='p-4 sm:px-6'>
+      <Cross2Icon className='w-6 h-6 cursor-pointer ml-auto' />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 p-4'>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
           <FormField
             control={form.control}
             name='location'
