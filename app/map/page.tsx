@@ -75,7 +75,7 @@ export default function MapPage() {
       <AnimatePresence>
         {newPin && (
           <motion.div
-            className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120'
+            className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}

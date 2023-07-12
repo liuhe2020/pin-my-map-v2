@@ -16,6 +16,8 @@ import { Calendar } from './ui/calendar';
 import { format } from 'date-fns';
 import { Textarea } from './ui/textarea';
 import { Cross2Icon } from '@radix-ui/react-icons';
+import { useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -26,7 +28,7 @@ const formSchema = z.object({
   country: z.string(),
   date: z.date().optional(),
   description: z.string().optional(),
-  photos: z.array(z.string()).optional(),
+  photos: z.string().optional(),
 });
 
 export default function AddPin({ newPin }: { newPin: NewPin }) {
@@ -39,9 +41,14 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
       country: newPin.country,
       date: undefined,
       description: '',
-      photos: [],
+      photos: '',
     },
   });
+
+  const onDrop = useCallback((acceptedFiles) => {
+    // Do something with the files
+  }, []);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, onClick: true });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
@@ -145,13 +152,13 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea className='resize-none' {...field} />
+                  <Textarea className='resize-none' {...field} rows={10} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name='photos'
             render={({ field }) => (
@@ -163,7 +170,14 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
+          <div {...getRootProps()} className='border border-dashed border-input rounded-md min-h-[120px]'>
+            <input {...getInputProps()} />
+            {isDragActive ? <p>Drop the files here ...</p> : <p>Drag 'n' drop some files here, or click to select files</p>}
+            <div className='' onClick={() => alert('hello')}>
+              heloo
+            </div>
+          </div>
           <Button type='submit'>Submit</Button>
         </form>
       </Form>
