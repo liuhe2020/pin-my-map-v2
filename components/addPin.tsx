@@ -5,19 +5,20 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
-import { NewPin } from './types';
+import type { NewPin, UploadImage } from './types';
 import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from './ui/calendar';
 import { format } from 'date-fns';
 import { Textarea } from './ui/textarea';
-import { Cross2Icon } from '@radix-ui/react-icons';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
+import Image from 'next/image';
+import { AiFillMinusCircle, AiOutlineClose } from 'react-icons/ai';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -32,6 +33,8 @@ const formSchema = z.object({
 });
 
 export default function AddPin({ newPin }: { newPin: NewPin }) {
+  const [files, setFiles] = useState([]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,9 +49,21 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
   });
 
   const onDrop = useCallback((acceptedFiles) => {
-    // Do something with the files
+    const addition = acceptedFiles.map((file) =>
+      Object.assign(file, {
+        preview: URL.createObjectURL(file),
+      })
+    );
+    setFiles((prev) => [...prev, ...addition]);
   }, []);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, onClick: true });
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    noClick: true,
+    accept: {
+      'image/*': [],
+    },
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
@@ -58,7 +73,7 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
 
   return (
     <div className='p-4 sm:px-6'>
-      <Cross2Icon className='w-6 h-6 cursor-pointer ml-auto' />
+      <AiOutlineClose className='w-6 h-6 cursor-pointer ml-auto' />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
           <FormField
@@ -172,10 +187,30 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
             )}
           /> */}
           <div {...getRootProps()} className='border border-dashed border-input rounded-md min-h-[120px]'>
-            <input {...getInputProps()} />
-            {isDragActive ? <p>Drop the files here ...</p> : <p>Drag 'n' drop some files here, or click to select files</p>}
-            <div className='' onClick={() => alert('hello')}>
-              heloo
+            {/* <input {...getInputProps()} /> */}
+            {/* <p>Drag & drop here</p>
+            <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'>
+              <path d='M19.479 10.092c-.212-3.951-3.473-7.092-7.479-7.092-4.005 0-7.267 3.141-7.479 7.092-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h13c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408zm-7.479-1.092l4 4h-3v4h-2v-4h-3l4-4z' />
+            </svg> */}
+            <div className='grid grid-cols-3 p-6 gap-6'>
+              {files.map((file) => (
+                <div key={file.name} className='relative'>
+                  <div className='relative'>
+                    <Image
+                      src={file.preview}
+                      alt={file.name}
+                      width={120}
+                      height={120}
+                      className='aspect-square object-cover'
+                      // Revoke data uri after image is loaded
+                      onLoad={() => {
+                        URL.revokeObjectURL(file.preview);
+                      }}
+                    />
+                  </div>
+                  <AiFillMinusCircle className='absolute -top-[13px] -right-3 w-6 h-6' />
+                </div>
+              ))}
             </div>
           </div>
           <Button type='submit'>Submit</Button>

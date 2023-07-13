@@ -8,3 +8,14 @@ export type NewPin = {
   latitude: number;
   longitude: number;
 };
+
+export type UploadImage = {
+  path: string;
+  preview: Blob;
+  lastModified: number;
+  lastModifiedDate: Date;
+  name: string;
+  size: number;
+  type: string;
+  webkitRelativePath: string;
+};
