@@ -65,6 +65,13 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
     },
   });
 
+  console.log(files);
+
+  const handleRemovePhoto = (preview) => {
+    const filteredFiles = files.filter((i) => i.preview !== preview);
+    setFiles(filteredFiles);
+  };
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
@@ -137,7 +144,7 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
-                      <Button variant={'outline'} className={cn('w-[240px] pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                      <Button variant={'outline'} className={cn('pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
                         {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
                         <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                       </Button>
@@ -186,31 +193,37 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
               </FormItem>
             )}
           /> */}
-          <div {...getRootProps()} className='border border-dashed border-input rounded-md min-h-[120px]'>
-            {/* <input {...getInputProps()} /> */}
-            {/* <p>Drag & drop here</p>
+          <div className=''>
+            <p className='text-sm font-medium'>Photos</p>
+            <div {...getRootProps()} className='border border-dashed border-input rounded-md min-h-[120px] mt-2'>
+              {/* <input {...getInputProps()} /> */}
+              {/* <p>Drag & drop here</p>
             <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'>
               <path d='M19.479 10.092c-.212-3.951-3.473-7.092-7.479-7.092-4.005 0-7.267 3.141-7.479 7.092-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h13c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408zm-7.479-1.092l4 4h-3v4h-2v-4h-3l4-4z' />
             </svg> */}
-            <div className='grid grid-cols-3 p-6 gap-6'>
-              {files.map((file) => (
-                <div key={file.name} className='relative'>
-                  <div className='relative'>
-                    <Image
-                      src={file.preview}
-                      alt={file.name}
-                      width={120}
-                      height={120}
-                      className='aspect-square object-cover'
-                      // Revoke data uri after image is loaded
-                      onLoad={() => {
-                        URL.revokeObjectURL(file.preview);
-                      }}
+              <div className='grid grid-cols-3 p-6 gap-6'>
+                {files.map((file) => (
+                  <div key={file.preview} className='relative'>
+                    <div className='relative'>
+                      <Image
+                        src={file.preview}
+                        alt={file.name}
+                        width={120}
+                        height={120}
+                        className='aspect-square object-cover'
+                        // Revoke data uri after image is loaded
+                        onLoad={() => {
+                          URL.revokeObjectURL(file.preview);
+                        }}
+                      />
+                    </div>
+                    <AiFillMinusCircle
+                      className='absolute -top-[13px] -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
+                      onClick={() => handleRemovePhoto(file.preview)}
                     />
                   </div>
-                  <AiFillMinusCircle className='absolute -top-[13px] -right-3 w-6 h-6' />
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
           <Button type='submit'>Submit</Button>
