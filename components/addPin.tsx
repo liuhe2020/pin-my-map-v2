@@ -8,16 +8,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
-import type { NewPin, UploadImage } from './types';
+import type { NewPin } from './types';
 import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from './ui/calendar';
 import { format } from 'date-fns';
 import { Textarea } from './ui/textarea';
-import { useCallback, useState } from 'react';
+import { MouseEvent, useCallback, useState } from 'react';
 import { useDropzone, type FileWithPath } from 'react-dropzone';
 import Image from 'next/image';
 import { AiFillMinusCircle, AiOutlineClose } from 'react-icons/ai';
+import { BiSolidCloudUpload } from 'react-icons/bi';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -56,17 +57,17 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
     setFiles((prev) => [...prev, ...addition]);
   }, []);
 
-  console.log(files);
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    noClick: true,
     accept: {
       'image/*': [],
     },
   });
 
-  const handleRemovePhoto = (preview: string) => {
+  console.log(isDragActive);
+
+  const handleRemovePhoto = (e: MouseEvent, preview: string) => {
+    e.stopPropagation();
     const filteredFiles = files.filter((i) => i.preview !== preview);
     setFiles(filteredFiles);
   };
@@ -179,49 +180,42 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
               </FormItem>
             )}
           />
-          {/* <FormField
-            control={form.control}
-            name='photos'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Photos</FormLabel>
-                <FormControl>
-                  <Input type='file' multiple {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
           <div className=''>
             <p className='text-sm font-medium'>Photos</p>
-            <div {...getRootProps()} className='border border-dashed border-input rounded-md min-h-[120px] mt-2'>
-              {/* <input {...getInputProps()} /> */}
-              {/* <p>Drag & drop here</p>
-            <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24'>
-              <path d='M19.479 10.092c-.212-3.951-3.473-7.092-7.479-7.092-4.005 0-7.267 3.141-7.479 7.092-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h13c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408zm-7.479-1.092l4 4h-3v4h-2v-4h-3l4-4z' />
-            </svg> */}
-              <div className='grid grid-cols-3 p-6 gap-6'>
-                {files.map((file) => (
-                  <div key={file.preview} className='relative'>
-                    <div className='relative'>
-                      <Image
-                        src={file.preview}
-                        alt={file.name}
-                        width={120}
-                        height={120}
-                        className='aspect-square object-cover'
-                        // Revoke data uri after image is loaded
-                        onLoad={() => {
-                          URL.revokeObjectURL(file.preview);
-                        }}
-                      />
-                    </div>
-                    <AiFillMinusCircle
-                      className='absolute -top-[13px] -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
-                      onClick={() => handleRemovePhoto(file.preview)}
-                    />
+            <div {...getRootProps()} className='border border-input rounded-md mt-2 cursor-pointer'>
+              <div className={cn(isDragActive && 'border-2 border-dashed border-orange-600 rounded-md', 'min-h-[160px] flex items-center justify-center m-1')}>
+                {/* <input {...getInputProps()} /> */}
+                {files.length > 0 && (
+                  <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'grid grid-cols-3 p-6 gap-6 transition-all duration-400')}>
+                    {files.map((file) => (
+                      <div key={file.preview} className='relative'>
+                        <div className='relative'>
+                          <Image
+                            src={file.preview}
+                            alt={file.name}
+                            width={120}
+                            height={120}
+                            className='aspect-square object-cover rounded-md'
+                            // Revoke data uri after image is loaded
+                            onLoad={() => {
+                              URL.revokeObjectURL(file.preview);
+                            }}
+                          />
+                        </div>
+                        <AiFillMinusCircle
+                          className='absolute -top-3 -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
+                          onClick={(e) => handleRemovePhoto(e, file.preview)}
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+                {files.length === 0 && (
+                  <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'flex flex-col items-center gap-y-2 my-auto transition-all duration-400')}>
+                    <p className='text-sm font-medium'>Click to select photos, or drag and drop here</p>
+                    <BiSolidCloudUpload className='w-6 h-6' />
+                  </div>
+                )}
               </div>
             </div>
           </div>
