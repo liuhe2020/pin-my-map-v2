@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -16,7 +15,7 @@ import { Calendar } from './ui/calendar';
 import { format } from 'date-fns';
 import { Textarea } from './ui/textarea';
 import { useCallback, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, type FileWithPath } from 'react-dropzone';
 import Image from 'next/image';
 import { AiFillMinusCircle, AiOutlineClose } from 'react-icons/ai';
 
@@ -33,7 +32,7 @@ const formSchema = z.object({
 });
 
 export default function AddPin({ newPin }: { newPin: NewPin }) {
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<(FileWithPath & { preview: string })[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,7 +47,7 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
     },
   });
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
     const addition = acceptedFiles.map((file) =>
       Object.assign(file, {
         preview: URL.createObjectURL(file),
@@ -56,6 +55,8 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
     );
     setFiles((prev) => [...prev, ...addition]);
   }, []);
+
+  console.log(files);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -65,9 +66,7 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
     },
   });
 
-  console.log(files);
-
-  const handleRemovePhoto = (preview) => {
+  const handleRemovePhoto = (preview: string) => {
     const filteredFiles = files.filter((i) => i.preview !== preview);
     setFiles(filteredFiles);
   };
