@@ -1,7 +1,13 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { FaGoogle, FaMapMarkedAlt, FaPowerOff } from 'react-icons/fa';
 
 export default function HomePage() {
+  const { data: session } = useSession();
+
   return (
     <main className=''>
       <div className="relative before:bg-[url('/images/background.jpg')] before:opacity-60 before:-z-10 before:w-full before:h-screen before:fixed before:inset-0 before:object-cover before:object-left before:bg-no-repeat grid place-items-center h-screen">
@@ -13,17 +19,32 @@ export default function HomePage() {
             Create a personalised map of your world. Mark your favorite spots, travel footprints and explore new places.
           </h2>
           <div className='flex flex-col gap-y-3'>
+            {!session && (
+              <button
+                type='button'
+                className='flex justify-center items-center gap-x-2 text-white bg-orange-500 hover:brightness-110 font-semibold rounded-lg p-3.5 focus:outline-none w-full mx-auto lg:mx-0 text-center shadow-neutral-300 shadow-md'
+                onClick={() => signIn('google')}
+              >
+                <FaGoogle className='w-4 h-4' />
+                <span>Sign in with Google</span>
+              </button>
+            )}
+            {session && (
+              <button
+                type='button'
+                className='flex justify-center items-center gap-x-2 text-white bg-orange-500 hover:brightness-110 font-semibold rounded-lg p-3.5 focus:outline-none w-full mx-auto lg:mx-0 text-center shadow-neutral-300 shadow-md'
+                onClick={() => signOut()}
+              >
+                <FaPowerOff className='w-4 h-4' />
+                <span>Sign out</span>
+              </button>
+            )}
             <Link
-              className='text-white bg-orange-500 hover:brightness-110 font-semibold rounded-lg p-3.5 focus:outline-none w-full block mx-auto lg:mx-0 text-center shadow-neutral-300 shadow-md'
-              href='/signin'
-            >
-              Try now
-            </Link>
-            <Link
-              className='text-white bg-indigo-500 hover:brightness-110 font-semibold rounded-lg p-3.5 focus:outline-none w-full block mx-auto lg:mx-0 text-center shadow-neutral-300 shadow-md'
+              className='flex justify-center items-center gap-x-2 text-white bg-indigo-500 hover:brightness-110 font-semibold rounded-lg p-3.5 focus:outline-none w-full mx-auto lg:mx-0 text-center shadow-neutral-300 shadow-md'
               href='/maps/1'
             >
-              View demo
+              <FaMapMarkedAlt className='w-4 h-4' />
+              <span>View demo</span>
             </Link>
           </div>
         </div>
