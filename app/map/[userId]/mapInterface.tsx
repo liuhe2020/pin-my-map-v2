@@ -12,7 +12,7 @@ import type { NewPin } from '@/components/types';
 const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
 const ease = [[0.4, 0, 0.6, 1]];
 
-export default function MapPage() {
+export default function MapInterface() {
   const [viewState, setViewState] = useState({
     latitude: 46,
     longitude: 17,

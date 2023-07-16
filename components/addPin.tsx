@@ -19,6 +19,7 @@ import { useDropzone, type FileWithPath } from 'react-dropzone';
 import Image from 'next/image';
 import { AiFillMinusCircle, AiOutlineClose } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
+import { useSession } from 'next-auth/react';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -33,6 +34,7 @@ const formSchema = z.object({
 });
 
 export default function AddPin({ newPin }: { newPin: NewPin }) {
+  const { data: session } = useSession();
   const [files, setFiles] = useState<(FileWithPath & { preview: string })[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,7 +59,7 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
     setFiles((prev) => [...prev, ...addition]);
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       'image/*': [],
@@ -144,9 +146,9 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
-                      <Button variant={'outline'} className={cn('pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                      <Button variant={'outline'} className={cn('justify-start text-left font-normal', !field.value && 'text-muted-foreground')}>
+                        <CalendarIcon className='mr-2 h-4 w-4' />
                         {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                        <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
