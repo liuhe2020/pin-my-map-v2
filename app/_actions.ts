@@ -10,11 +10,7 @@ const cloudinaryConfig = cloudinary.config({
 });
 
 export async function getSignature() {
-  const timestamp = Math.round(new Date().getTime() / 1000);
-
-  const signature = cloudinary.utils.api_sign_request({ timestamp, folder: 'next' }, cloudinaryConfig.api_secret!);
-
-  return { timestamp, signature };
+  console.log('00000000000000000000000000000000');
 }
 
 export async function saveToDatabase({ public_id, version, signature }: { public_id: string; version: string; signature: string }) {
@@ -25,4 +21,8 @@ export async function saveToDatabase({ public_id, version, signature }: { public
     // safe to write to database
     console.log({ public_id });
   }
+}
+
+export async function action(data: FormData) {
+  console.log(data);
 }

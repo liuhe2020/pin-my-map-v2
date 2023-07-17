@@ -8,12 +8,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
-import type { NewPin } from './types';
+import type { NewPin } from '../../../components/types';
 import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
-import { Calendar } from './ui/calendar';
+import { Calendar } from '../../../components/ui/calendar';
 import { format } from 'date-fns';
-import { Textarea } from './ui/textarea';
+import { Textarea } from '../../../components/ui/textarea';
 import { MouseEvent, useCallback, useState } from 'react';
 import { useDropzone, type FileWithPath } from 'react-dropzone';
 import Image from 'next/image';
@@ -66,19 +66,25 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
     },
   });
 
-  console.log(isDragActive);
-
   const handleRemovePhoto = (e: MouseEvent, preview: string) => {
     e.stopPropagation();
     const filteredFiles = files.filter((i) => i.preview !== preview);
     setFiles(filteredFiles);
   };
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-  }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // console.log(values);
+    const sigResponse = await fetch('/api/cloudinary-signature');
+    const { signature, timestamp } = await sigResponse.json();
+
+    const formData = new FormData();
+
+    // formData.append('file', files[0]);
+    // formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
+    // formData.append('signature', signature);
+    // formData.append('timestamp', timestamp);
+    // formData.append('folder', 'next');
+  };
 
   return (
     <div className='p-4 sm:px-6'>

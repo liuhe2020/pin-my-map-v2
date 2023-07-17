@@ -6,7 +6,7 @@ import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl'
 import GeocoderControl from '@/components/geocoder';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import AddPin from '@/components/addPin';
+import AddPin from '@/app/map/[userId]/addPin';
 import type { NewPin } from '@/components/types';
 
 const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
