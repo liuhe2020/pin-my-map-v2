@@ -14,7 +14,7 @@ export async function GET() {
   // get user/session
   const session = await getServerSession(authOptions);
 
-  if (!session?.user) return NextResponse.json({ message: 'User is not signed in.' }, { status: 500 });
+  if (!session?.user) return NextResponse.json({ message: 'User is not signed in.' }, { status: 400 });
 
   const timestamp = Math.round(new Date().getTime() / 1000);
 

@@ -30,7 +30,6 @@ const formSchema = z.object({
   country: z.string(),
   date: z.date().optional(),
   description: z.string().optional(),
-  photos: z.string().optional(),
 });
 
 export default function AddPin({ newPin }: { newPin: NewPin }) {
@@ -46,7 +45,6 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
       country: newPin.country,
       date: undefined,
       description: '',
-      photos: '',
     },
   });
 
@@ -75,15 +73,38 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // console.log(values);
     const sigResponse = await fetch('/api/cloudinary-signature');
+    if (sigResponse.status !== 200) alert('failed');
     const { signature, timestamp } = await sigResponse.json();
 
     const formData = new FormData();
 
-    // formData.append('file', files[0]);
-    // formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
-    // formData.append('signature', signature);
-    // formData.append('timestamp', timestamp);
-    // formData.append('folder', 'next');
+    let photosData: { id: string; url: string }[] = [];
+
+    if (files.length) {
+      const uploadFiles = files.map(async (file) => {
+        formData.append('file', file);
+        formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
+        formData.append('signature', signature);
+        formData.append('timestamp', timestamp);
+        formData.append('folder', 'pin-my-map');
+        const response = await fetch('https://api.cloudinary.com/v1_1/pin-my-map/image/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        return response.json();
+      });
+
+      const photos = await Promise.all(uploadFiles);
+      photosData = photos.map((photo) => ({ id: photo.public_id, url: photo.secure_url }));
+    }
+
+    const createPinResponse = await fetch('/api/create-pin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ pin: values, photos: photosData }),
+    });
   };
 
   return (
