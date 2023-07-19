@@ -8,3 +8,8 @@ export type NewPin = {
   latitude: number;
   longitude: number;
 };
+
+export type Photo = {
+  id: string;
+  url: string;
+};

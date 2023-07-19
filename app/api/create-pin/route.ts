@@ -2,7 +2,7 @@ import { authOptions } from '@/lib/authOptions';
 import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { NewPin } from '@/components/types';
+import type { Photo } from '@/components/types';
 
 export async function POST(request: Request) {
   // get user/session
@@ -12,9 +12,8 @@ export async function POST(request: Request) {
 
   const { pin, photos } = await request.json();
 
-  const createPin = async () =>
-    session.user &&
-    (await prisma.pin.create({
+  try {
+    const newPin = await prisma.pin.create({
       data: {
         location: pin.location,
         city: pin.city ? pin.city : null,
@@ -26,9 +25,12 @@ export async function POST(request: Request) {
         longitude: pin.longitude,
         userId: session.user.id,
       },
-    }));
+    });
 
-  //   return NextResponse.json({ message: 'No Cloudinary signature.' }, { status: 500 });
+    photos.length && (await prisma.photo.createMany({ data: photos.map((photo: Photo) => ({ ...photo, pin_id: newPin.id })) }));
 
-  //   return NextResponse.json({ timestamp, signature }, { status: 200 });
+    return NextResponse.json({ message: 'New pin created.' }, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({ message: 'Failed to create new pin.', error: err }, { status: 500 });
+  }
 }

@@ -67,12 +67,12 @@ model Pin {
   longitude   Float
   userId      String
   photos      Photo[]
-  user        User      @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id],onDelete: Cascade)
 }
 
 model Photo {
   id     String @id
   url    String
   pin_id String
-  pin    Pin    @relation(fields: [pin_id], references: [id])
+  pin    Pin    @relation(fields: [pin_id], references: [id],onDelete: Cascade)
 }
