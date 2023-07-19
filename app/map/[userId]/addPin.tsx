@@ -103,7 +103,7 @@ export default function AddPin({ newPin }: { newPin: NewPin }) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ pin: values, photos: photosData }),
+      body: JSON.stringify({ pin: { ...values, latitude: newPin.latitude, longitude: newPin.longitude }, photos: photosData }),
     });
   };
 
