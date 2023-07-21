@@ -1,6 +1,7 @@
 import React from 'react';
 import prisma from '@/lib/prisma';
 import MapInterface from './mapInterface';
+import { Prisma } from '@prisma/client';
 
 type Props = { params: { userId: string } };
 
@@ -25,11 +26,23 @@ export default async function UserMapPage({ params: { userId } }: Props) {
     where: {
       id: userId,
     },
+    include: {
+      pins: {
+        include: {
+          photos: {
+            select: {
+              id: true,
+              url: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   return (
     <div>
-      <MapInterface />
+      <MapInterface user={user} />
     </div>
   );
 }

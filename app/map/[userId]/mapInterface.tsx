@@ -7,12 +7,12 @@ import GeocoderControl from '@/components/geocoder';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import AddPin from '@/app/map/[userId]/addPin';
-import type { NewPin } from '@/components/types';
+import type { Pin, UserWithPins } from '@/components/types';
 
 const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
 const ease = [[0.4, 0, 0.6, 1]];
 
-export default function MapInterface() {
+export default function MapInterface({ user }: { user: UserWithPins | null }) {
   const [viewState, setViewState] = useState({
     latitude: 46,
     longitude: 17,
@@ -21,7 +21,7 @@ export default function MapInterface() {
 
   const mapRef = useRef<MapRef>(null);
 
-  const [newPin, setNewPin] = useState<null | NewPin>(null);
+  const [newPin, setNewPin] = useState<null | Pin>(null);
 
   // create a new marker at clicked location
   const handleMapClick = async (e: MapLayerMouseEvent) => {

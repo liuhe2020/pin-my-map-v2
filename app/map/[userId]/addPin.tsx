@@ -8,7 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
-import type { NewPin } from '../../../components/types';
+import type { Pin } from '../../../components/types';
 import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '../../../components/ui/calendar';
@@ -32,7 +32,7 @@ const formSchema = z.object({
   description: z.string().optional(),
 });
 
-export default function AddPin({ newPin }: { newPin: NewPin }) {
+export default function AddPin({ newPin }: { newPin: Pin }) {
   const { data: session } = useSession();
   const [files, setFiles] = useState<(FileWithPath & { preview: string })[]>([]);
 
