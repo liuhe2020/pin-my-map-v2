@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 
-export interface Pin {
+export interface PinDetails {
   location: string;
   city?: string;
   region?: string;
@@ -31,4 +31,16 @@ const userWithPins = Prisma.validator<Prisma.UserArgs>()({
   },
 });
 
+const pinWithPhotos = Prisma.validator<Prisma.PinArgs>()({
+  include: {
+    photos: {
+      select: {
+        id: true,
+        url: true,
+      },
+    },
+  },
+});
+
 export type UserWithPins = Prisma.UserGetPayload<typeof userWithPins>;
+export type PinWithPhotos = Prisma.PinGetPayload<typeof pinWithPhotos>;

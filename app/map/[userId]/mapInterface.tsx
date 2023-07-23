@@ -7,11 +7,11 @@ import GeocoderControl from '@/components/geocoder';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import AddPin from '@/app/map/[userId]/addPin';
-import type { Pin, UserWithPins } from '@/components/types';
+import type { PinDetails, UserWithPins } from '@/components/types';
 import Image from 'next/image';
 import Drawer from './drawer';
-import { Provider as JotaiProvider, useAtom } from 'jotai';
 import { pinAtom } from '@/lib/atoms';
+import { useAtom } from 'jotai';
 
 const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
 const ease = [[0.4, 0, 0.6, 1]];
@@ -22,11 +22,11 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
     longitude: 17,
     zoom: 4,
   });
-  const [currentPin, setCurrentPin] = useAtom(pinAtom);
+  const [pin, setPin] = useAtom(pinAtom);
 
   const mapRef = useRef<MapRef>(null);
 
-  const [newPin, setNewPin] = useState<null | Pin>(null);
+  const [newPin, setNewPin] = useState<null | PinDetails>(null);
 
   // create a new marker at clicked location
   const handleMapClick = async (e: MapLayerMouseEvent) => {
@@ -52,70 +52,71 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
   };
 
   return (
-    <JotaiProvider>
-      <div className='overflow-hidden relative'>
-        <div className='w-full h-screen'>
-          <Map
-            ref={mapRef}
-            {...viewState}
-            onMove={(evt) => setViewState(evt.viewState)}
-            mapboxAccessToken={mapBoxToken}
-            doubleClickZoom={false}
-            mapStyle='mapbox://styles/liuhe2020/cktu2h4q70wil17m6umh33a9i'
-            minZoom={1.585} // limit zoom out to single world map
-            maxZoom={19}
-            onClick={handleMapClick}
-          >
-            <GeocoderControl mapboxAccessToken={mapBoxToken} position='top-left' />
-            {newPin && (
-              <Marker
-                latitude={newPin.latitude}
-                longitude={newPin.longitude}
-                offset={[0, -14]} //centering marker
-              >
-                <Image src='/images/marker_blue.svg' alt='marker_pin' width={32} height={48} />
-              </Marker>
-            )}
-            {user?.pins.map((pin) => (
-              <Marker
-                key={pin.id}
-                latitude={pin.latitude}
-                longitude={pin.longitude}
-                offset={[0, -14]} //centering marker
-                onClick={() => setCurrentPin(pin)}
-              >
-                <Image src='/images/marker_orange.svg' alt='marker_pin' width={32} height={48} />
-              </Marker>
-            ))}
-          </Map>
-        </div>
-        <AnimatePresence>
+    <div className='overflow-hidden relative'>
+      <div className='w-full h-screen'>
+        <Map
+          ref={mapRef}
+          {...viewState}
+          onMove={(evt) => setViewState(evt.viewState)}
+          mapboxAccessToken={mapBoxToken}
+          doubleClickZoom={false}
+          mapStyle='mapbox://styles/liuhe2020/cktu2h4q70wil17m6umh33a9i'
+          minZoom={1.585} // limit zoom out to single world map
+          maxZoom={19}
+          onClick={handleMapClick}
+        >
+          <GeocoderControl mapboxAccessToken={mapBoxToken} position='top-left' />
           {newPin && (
-            <motion.div
-              key='create'
-              className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ duration: 0.4, ease }}
+            <Marker
+              latitude={newPin.latitude}
+              longitude={newPin.longitude}
+              offset={[0, -14]} //centering marker
             >
-              <AddPin newPin={newPin} />
-            </motion.div>
+              <Image src='/images/marker_blue.svg' alt='marker_pin' width={32} height={48} />
+            </Marker>
           )}
-          {currentPin && (
-            <motion.div
-              key='current'
-              className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ duration: 0.4, ease }}
+          {user?.pins.map((pin) => (
+            <Marker
+              key={pin.id}
+              latitude={pin.latitude}
+              longitude={pin.longitude}
+              offset={[0, -14]} //centering marker
+              onClick={(e) => {
+                e.originalEvent.stopPropagation(); // stop add pin firing on existing pins
+                setPin(pin);
+              }}
             >
-              {/* <Drawer /> */}
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <Image src='/images/marker_orange.svg' alt='marker_pin' width={32} height={48} />
+            </Marker>
+          ))}
+        </Map>
       </div>
-    </JotaiProvider>
+      <AnimatePresence>
+        {newPin && (
+          <motion.div
+            key='create'
+            className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ duration: 0.4, ease }}
+          >
+            <AddPin newPin={newPin} />
+          </motion.div>
+        )}
+        {pin && (
+          <motion.div
+            key='current'
+            className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ duration: 0.4, ease }}
+          >
+            <Drawer />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

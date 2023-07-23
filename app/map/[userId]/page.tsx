@@ -1,6 +1,7 @@
 import React from 'react';
 import prisma from '@/lib/prisma';
 import MapInterface from './mapInterface';
+import JotaiProvider from '@/components/JotaiProvider';
 
 type Props = { params: { userId: string } };
 
@@ -39,5 +40,9 @@ export default async function UserMapPage({ params: { userId } }: Props) {
     },
   });
 
-  return <MapInterface user={user} />;
+  return (
+    <JotaiProvider>
+      <MapInterface user={user} />
+    </JotaiProvider>
+  );
 }
