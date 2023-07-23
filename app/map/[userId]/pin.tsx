@@ -1,11 +1,24 @@
+'use client';
+
 import { pinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import Image from 'next/image';
+import { useState } from 'react';
 import { Lightbox } from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
 import 'yet-another-react-lightbox/styles.css';
+import 'yet-another-react-lightbox/plugins/thumbnails.css';
 
 export default function Pin() {
+  const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
+  const [slideIndex, setSlideIndex] = useState(0);
   const [pin] = useAtom(pinAtom);
+
+  const handleClick = (i: number) => {
+    setIsLightBoxOpen(true);
+    setSlideIndex(i);
+  };
 
   return (
     <div className='space-y-6 text-sm font-medium'>
@@ -33,15 +46,32 @@ export default function Pin() {
         <h2>Description</h2>
         <p className=''>{pin?.description}</p>
       </div>
-      <div className='space-y-2'>
-        <h2>Photos</h2>
-        <div className='grid grid-cols-3 gap-2'>
-          {pin?.photos.map((photo) => (
-            <Image key={photo.id} src={photo.url} alt={pin.location} width={140} height={140} className='aspect-square object-cover cursor-pointer' />
-          ))}
+      {pin && pin.photos.length > 0 && (
+        <div className='space-y-2'>
+          <h2>Photos</h2>
+          <div className='grid grid-cols-3 gap-2'>
+            {pin?.photos.map((photo, i) => (
+              <Image
+                key={photo.id}
+                src={photo.url}
+                alt={pin.location}
+                width={140}
+                height={140}
+                className='aspect-square object-cover cursor-pointer'
+                onClick={() => handleClick(i)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-      <Lightbox open={true} slides={pin?.photos.map((photo) => ({ src: photo.url }))} />
+      )}
+      <Lightbox
+        open={isLightBoxOpen}
+        close={() => setIsLightBoxOpen(false)}
+        slides={pin?.photos.map((photo) => ({ src: photo.url, alt: pin.location }))}
+        index={slideIndex}
+        plugins={pin && pin.photos.length > 1 ? [Zoom, Thumbnails] : [Zoom]}
+        carousel={{ finite: true }}
+      />
     </div>
   );
 }

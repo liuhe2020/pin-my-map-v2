@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -20,6 +19,8 @@ import Image from 'next/image';
 import { AiFillMinusCircle, AiOutlineClose } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
 import { useSession } from 'next-auth/react';
+import { useAtom } from 'jotai';
+import { isAddingAtom } from '@/lib/atoms';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -35,6 +36,7 @@ const formSchema = z.object({
 export default function AddPin({ newPin }: { newPin: PinDetails }) {
   const { data: session } = useSession();
   const [files, setFiles] = useState<(FileWithPath & { preview: string })[]>([]);
+  const [, setIsAdding] = useAtom(isAddingAtom);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -109,7 +111,7 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
 
   return (
     <div className='p-4 sm:px-6'>
-      <AiOutlineClose className='w-6 h-6 cursor-pointer ml-auto' />
+      <AiOutlineClose className='w-6 h-6 cursor-pointer ml-auto' onClick={() => setIsAdding(false)} />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
           <FormField

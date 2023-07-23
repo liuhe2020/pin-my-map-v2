@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 
 export interface PinDetails {
-  location: string;
+  location?: string;
   city?: string;
   region?: string;
   country?: string;
