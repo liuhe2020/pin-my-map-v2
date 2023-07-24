@@ -75,7 +75,7 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // console.log(values);
     const sigResponse = await fetch('/api/cloudinary-signature');
-    if (sigResponse.status !== 200) alert('failed');
+    if (sigResponse.status !== 200) return alert('failed');
     const { signature, timestamp } = await sigResponse.json();
 
     const formData = new FormData();
