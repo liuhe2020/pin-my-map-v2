@@ -6,7 +6,7 @@ import { AiOutlineClose } from 'react-icons/ai';
 
 export default function Drawer() {
   const [isEditing] = useAtom(isEditingAtom);
-  const [pin, setPin] = useAtom(pinAtom);
+  const [, setPin] = useAtom(pinAtom);
 
   return (
     <div className='p-4 sm:px-6'>

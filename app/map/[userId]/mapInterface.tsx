@@ -30,6 +30,7 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
 
   // create a new marker at clicked location
   const handleMapClick = async (e: MapLayerMouseEvent) => {
+    if (pin) return setPin(null);
     if (!isAdding) {
       if (newPin) return setNewPin(null);
       const latitude = e.lngLat.lat;

@@ -1,19 +1,31 @@
 'use client';
 
-import { pinAtom } from '@/lib/atoms';
+import 'yet-another-react-lightbox/styles.css';
+import 'yet-another-react-lightbox/plugins/thumbnails.css';
+import { useState } from 'react';
+import { isEditingAtom, pinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import Image from 'next/image';
-import { useState } from 'react';
 import { Lightbox } from 'yet-another-react-lightbox';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
-import 'yet-another-react-lightbox/styles.css';
-import 'yet-another-react-lightbox/plugins/thumbnails.css';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export default function Pin() {
   const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
   const [pin] = useAtom(pinAtom);
+  const [, setIsEditing] = useAtom(isEditingAtom);
 
   const handleClick = (i: number) => {
     setIsLightBoxOpen(true);
@@ -64,6 +76,34 @@ export default function Pin() {
           </div>
         </div>
       )}
+      <div className='flex gap-x-2'>
+        <button
+          type='button'
+          className='flex justify-center items-center gap-x-2 text-white bg-indigo-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24 mx-auto lg:mx-0 text-center'
+          onClick={() => setIsEditing(true)}
+        >
+          Edit
+        </button>
+        <AlertDialog>
+          <AlertDialogTrigger
+            className={
+              'flex justify-center items-center gap-x-2 text-white bg-red-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24 mx-auto lg:mx-0 text-center'
+            }
+          >
+            Delete
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>This action cannot be undone. This will permanently delete your pin and remove your data.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className={'w-24 font-medium'}>Cancel</AlertDialogCancel>
+              <AlertDialogAction className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
       <Lightbox
         open={isLightBoxOpen}
         close={() => setIsLightBoxOpen(false)}
