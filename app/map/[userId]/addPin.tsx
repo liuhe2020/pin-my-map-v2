@@ -35,7 +35,7 @@ const formSchema = z.object({
 
 export default function AddPin({ newPin }: { newPin: PinDetails }) {
   const { data: session } = useSession();
-  const [files, setFiles] = useState<(FileWithPath & { preview: string })[]>([]);
+  const [files, setFiles] = useState<string[]>([]);
   const [, setIsAdding] = useAtom(isAddingAtom);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -51,12 +51,21 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
   });
 
   const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
-    const addition = acceptedFiles.map((file) =>
-      Object.assign(file, {
-        preview: URL.createObjectURL(file),
-      })
-    );
-    setFiles((prev) => [...prev, ...addition]);
+    acceptedFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const { result } = e.target as FileReader;
+        if (typeof result === 'string') setFiles((prev) => [...prev, result]);
+      };
+    });
+
+    // const addition = acceptedFiles.map((file) =>
+    //   Object.assign(file, {
+    //     preview: URL.createObjectURL(file),
+    //   })
+    // );
+    // setFiles((prev) => [...prev, ...addition]);
   }, []);
 
   const { getRootProps, isDragActive } = useDropzone({
@@ -66,48 +75,23 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
     },
   });
 
-  const handleRemovePhoto = (e: MouseEvent, preview: string) => {
+  const handleRemovePhoto = (e: MouseEvent, index: number) => {
     e.stopPropagation();
-    const filteredFiles = files.filter((i) => i.preview !== preview);
+    const filteredFiles = files.filter((i, idx) => idx !== index);
     setFiles(filteredFiles);
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // console.log(values);
-    const sigResponse = await fetch('/api/cloudinary-signature');
-    if (sigResponse.status !== 200) return alert('failed');
-    const { signature, timestamp } = await sigResponse.json();
-
-    const formData = new FormData();
-
-    let photosData: { id: string; url: string }[] = [];
-
-    if (files.length) {
-      const uploadFiles = files.map(async (file) => {
-        formData.append('file', file);
-        formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
-        formData.append('signature', signature);
-        formData.append('timestamp', timestamp);
-        formData.append('folder', 'pin-my-map');
-        const response = await fetch('https://api.cloudinary.com/v1_1/pin-my-map/image/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        return response.json();
-      });
-
-      const photos = await Promise.all(uploadFiles);
-      photosData = photos.map((photo) => ({ id: photo.public_id, url: photo.secure_url }));
-    }
-
-    const createPinResponse = await fetch('/api/create-pin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ pin: { ...values, latitude: newPin.latitude, longitude: newPin.longitude }, photos: photosData }),
-    });
+    // const createPinResponse = await fetch('/api/create-pin', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ pin: { ...values, latitude: newPin.latitude, longitude: newPin.longitude }, photos: photosData }),
+    // });
   };
+
+  console.log(files);
 
   return (
     <div className='p-4 sm:px-6'>
@@ -218,24 +202,14 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
                 {/* <input {...getInputProps()} /> */}
                 {files.length > 0 && (
                   <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'grid grid-cols-3 p-6 gap-6 transition-all duration-400')}>
-                    {files.map((file) => (
-                      <div key={file.preview} className='relative'>
+                    {files.map((file, index) => (
+                      <div key={index} className='relative'>
                         <div className='relative'>
-                          <Image
-                            src={file.preview}
-                            alt={file.name}
-                            width={120}
-                            height={120}
-                            className='aspect-square object-cover rounded-md'
-                            // Revoke data uri after image is loaded
-                            onLoad={() => {
-                              URL.revokeObjectURL(file.preview);
-                            }}
-                          />
+                          <Image src={file} alt='preview' width={120} height={120} className='aspect-square object-cover rounded-md' />
                         </div>
                         <AiFillMinusCircle
                           className='absolute -top-3 -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
-                          onClick={(e) => handleRemovePhoto(e, file.preview)}
+                          onClick={(e) => handleRemovePhoto(e, index)}
                         />
                       </div>
                     ))}
