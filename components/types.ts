@@ -11,10 +11,10 @@ export interface PinDetails {
   longitude: number;
 }
 
-export interface Photo {
-  id: string;
-  url: string;
-}
+// export interface Photo {
+//   id: string;
+//   url: string;
+// }
 
 const userWithPins = Prisma.validator<Prisma.UserArgs>()({
   include: {

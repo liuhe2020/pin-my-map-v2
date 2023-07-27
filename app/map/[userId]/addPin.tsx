@@ -82,16 +82,14 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // const createPinResponse = await fetch('/api/create-pin', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ pin: { ...values, latitude: newPin.latitude, longitude: newPin.longitude }, photos: photosData }),
-    // });
+    const createPinResponse = await fetch('/api/create-pin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ pin: { ...values, latitude: newPin.latitude, longitude: newPin.longitude }, files }),
+    });
   };
-
-  console.log(files);
 
   return (
     <div className='p-4 sm:px-6'>

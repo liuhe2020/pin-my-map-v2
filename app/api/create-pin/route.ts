@@ -3,7 +3,14 @@ import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import prisma from '@/lib/prisma';
-import type { Photo } from '@/components/types';
+import { Photo } from 'prisma/prisma-client';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUDNAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
+});
 
 export async function POST(request: Request) {
   // get user/session
@@ -11,9 +18,10 @@ export async function POST(request: Request) {
 
   if (!session?.user) return NextResponse.json({ message: 'User is not signed in.' }, { status: 401 });
 
-  const { pin, photos } = await request.json();
+  const { pin, files } = await request.json();
 
   try {
+    // create pin in database
     const newPin = await prisma.pin.create({
       data: {
         location: pin.location,
@@ -28,14 +36,12 @@ export async function POST(request: Request) {
       },
     });
 
-    if (photos.length) {
-      const uploadPhotos = photos.map(async (photo) => await cloudinary.uploader.upload(photo, { folder: 'pin-my-map' }));
-
-      const uploadResponse = await Promise.all(uploadPhotos);
-      console.log(uploadResponse);
+    // upload to cloudinary & database
+    if (files.length) {
+      const uploadPhotos = files.map(async (file: string) => await cloudinary.uploader.upload(file, { folder: 'pin-my-map' }));
+      const photos = await Promise.all(uploadPhotos);
+      await prisma.photo.createMany({ data: photos.map((photo) => ({ id: photo.public_id, pin_id: newPin.id })) });
     }
-
-    // photos.length && (await prisma.photo.createMany({ data: photos.map((photo: Photo) => ({ ...photo, pin_id: newPin.id })) }));
 
     return NextResponse.json({ message: 'New pin created.' }, { status: 200 });
   } catch (err) {
