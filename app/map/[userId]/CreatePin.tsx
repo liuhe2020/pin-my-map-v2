@@ -18,9 +18,8 @@ import { useDropzone, type FileWithPath } from 'react-dropzone';
 import Image from 'next/image';
 import { AiFillMinusCircle, AiOutlineClose } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
-import { useSession } from 'next-auth/react';
 import { useAtom } from 'jotai';
-import { isAddingAtom } from '@/lib/atoms';
+import { drawerStateAtom } from '@/lib/atoms';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -33,10 +32,10 @@ const formSchema = z.object({
   description: z.string().optional(),
 });
 
-export default function AddPin({ newPin }: { newPin: PinDetails }) {
-  const { data: session } = useSession();
+export default function CreatePin({ newPin }: { newPin: PinDetails }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<string[]>([]);
-  const [, setIsAdding] = useAtom(isAddingAtom);
+  const [, setDrawerState] = useAtom(drawerStateAtom);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,13 +58,6 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
         if (typeof result === 'string') setFiles((prev) => [...prev, result]);
       };
     });
-
-    // const addition = acceptedFiles.map((file) =>
-    //   Object.assign(file, {
-    //     preview: URL.createObjectURL(file),
-    //   })
-    // );
-    // setFiles((prev) => [...prev, ...addition]);
   }, []);
 
   const { getRootProps, isDragActive } = useDropzone({
@@ -82,18 +74,25 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const createPinResponse = await fetch('/api/create-pin', {
+    setIsLoading(true);
+    const response = await fetch('/api/create-pin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ pin: { ...values, latitude: newPin.latitude, longitude: newPin.longitude }, files }),
     });
+    if (response.status !== 200) {
+      alert('failed');
+    } else {
+      alert('all good');
+    }
+    setIsLoading(false);
   };
 
   return (
     <div className='p-4 sm:px-6'>
-      <AiOutlineClose className='w-6 h-6 cursor-pointer ml-auto' onClick={() => setIsAdding(false)} />
+      <AiOutlineClose className='w-6 h-6 cursor-pointer ml-auto' onClick={() => setDrawerState('')} />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
           <FormField
@@ -195,8 +194,13 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
           />
           <div className=''>
             <p className='text-sm font-medium'>Photos</p>
-            <div {...getRootProps()} className='border border-input rounded-md mt-2 cursor-pointer'>
-              <div className={cn(isDragActive && 'border-2 border-dashed border-orange-600 rounded-md', 'min-h-[160px] flex items-center justify-center m-1')}>
+            <div {...getRootProps()} className='border border-input rounded-md mt-2 cursor-pointer group'>
+              <div
+                className={cn(
+                  isDragActive && 'border-2',
+                  'min-h-[160px] flex items-center justify-center m-1 group-hover:border-2 border-dashed border-indigo-500 rounded-md'
+                )}
+              >
                 {/* <input {...getInputProps()} /> */}
                 {files.length > 0 && (
                   <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'grid grid-cols-3 p-6 gap-6 transition-all duration-400')}>
@@ -216,13 +220,15 @@ export default function AddPin({ newPin }: { newPin: PinDetails }) {
                 {files.length === 0 && (
                   <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'flex flex-col items-center gap-y-2 my-auto transition-all duration-400')}>
                     <p className='text-sm font-medium'>Click to select photos, or drag and drop here</p>
-                    <BiSolidCloudUpload className='w-6 h-6' />
+                    <BiSolidCloudUpload className='w-6 h-6 text-indigo-500' />
                   </div>
                 )}
               </div>
             </div>
           </div>
-          <Button type='submit'>Submit</Button>
+          <Button type='submit' className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}>
+            Submit
+          </Button>
         </form>
       </Form>
     </div>

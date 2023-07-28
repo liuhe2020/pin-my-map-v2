@@ -1,7 +1,12 @@
-import { PinWithPhotos } from '@/components/types';
+import { PinDetails, PinWithPhotos } from '@/components/types';
 import { atom } from 'jotai';
 
-export const pinAtom = atom<PinWithPhotos | null>(null);
+const pinAtom = atom<PinWithPhotos | null>(null);
 
-export const isAddingAtom = atom(false);
-export const isEditingAtom = atom(false);
+const newPinAtom = atom<PinDetails | null>(null);
+
+const isDrawerOpenAtom = atom(false);
+
+const drawerStateAtom = atom('');
+
+export { pinAtom, newPinAtom, isDrawerOpenAtom, drawerStateAtom };

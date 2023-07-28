@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import prisma from '@/lib/prisma';
-import { Photo } from 'prisma/prisma-client';
+import { CloudinaryImage } from '@/components/types';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUDNAME,
@@ -39,8 +39,8 @@ export async function POST(request: Request) {
     // upload to cloudinary & database
     if (files.length) {
       const uploadPhotos = files.map(async (file: string) => await cloudinary.uploader.upload(file, { folder: 'pin-my-map' }));
-      const photos = await Promise.all(uploadPhotos);
-      await prisma.photo.createMany({ data: photos.map((photo) => ({ id: photo.public_id, pin_id: newPin.id })) });
+      const photos: CloudinaryImage[] = await Promise.all(uploadPhotos);
+      await prisma.photo.createMany({ data: photos.map((photo) => ({ id: photo.public_id, pin_id: newPin.id, url: photo.secure_url })) });
     }
 
     return NextResponse.json({ message: 'New pin created.' }, { status: 200 });

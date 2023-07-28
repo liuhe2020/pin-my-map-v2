@@ -6,11 +6,11 @@ import Map, { Marker, type MapLayerMouseEvent, type MapRef, type MapEvent, Marke
 import GeocoderControl from '@/components/geocoder';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import AddPin from '@/app/map/[userId]/addPin';
+import AddPin from '@/app/map/[userId]/CreatePin';
 import type { PinDetails, UserWithPins } from '@/components/types';
 import Image from 'next/image';
-import Drawer from './drawer';
-import { isAddingAtom, pinAtom } from '@/lib/atoms';
+import Drawer from './Drawer';
+import { pinAtom, isDrawerOpenAtom, drawerStateAtom, newPinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 
 const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
@@ -22,8 +22,9 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
     longitude: 17,
     zoom: 4,
   });
-  const [newPin, setNewPin] = useState<null | PinDetails>(null);
-  const [isAdding, setIsAdding] = useAtom(isAddingAtom);
+  const [newPin, setNewPin] = useAtom(newPinAtom);
+  const [isDrawerOpen, setIsDrawerOpen] = useAtom(isDrawerOpenAtom);
+  const [drawerState, setDrawerState] = useAtom(drawerStateAtom);
   const [pin, setPin] = useAtom(pinAtom);
 
   const mapRef = useRef<MapRef>(null);
@@ -31,7 +32,7 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
   // create a new marker at clicked location
   const handleMapClick = async (e: MapLayerMouseEvent) => {
     if (pin) return setPin(null);
-    if (!isAdding) {
+    if (!drawerState) {
       if (newPin) return setNewPin(null);
       const latitude = e.lngLat.lat;
       const longitude = e.lngLat.lng;
@@ -55,7 +56,7 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
 
       setNewPin({ ...newPin, location, city, region, country });
       mapRef.current?.easeTo({ center: [newPin.longitude, newPin.latitude], offset: [-240, 0] });
-      setIsAdding(true);
+      setDrawerState('');
     }
   };
 
@@ -102,21 +103,9 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
         </Map>
       </div>
       <AnimatePresence>
-        {newPin && isAdding && (
+        {isDrawerOpen && (
           <motion.div
             key='create'
-            className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ duration: 0.4, ease }}
-          >
-            <AddPin newPin={newPin} />
-          </motion.div>
-        )}
-        {pin && (
-          <motion.div
-            key='current'
             className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
             initial={{ x: '100%' }}
             animate={{ x: 0 }}

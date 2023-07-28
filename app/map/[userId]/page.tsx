@@ -1,6 +1,6 @@
 import React from 'react';
 import prisma from '@/lib/prisma';
-import MapInterface from './mapInterface';
+import MapInterface from './MapInterface';
 import JotaiProvider from '@/components/JotaiProvider';
 
 type Props = { params: { userId: string } };
