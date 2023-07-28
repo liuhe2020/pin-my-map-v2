@@ -3,7 +3,7 @@
 import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/thumbnails.css';
 import { useState } from 'react';
-import { isEditingAtom, pinAtom } from '@/lib/atoms';
+import { drawerStateAtom, pinDetailsAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import Image from 'next/image';
 import { Lightbox } from 'yet-another-react-lightbox';
@@ -21,13 +21,13 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-export default function Pin() {
+export default function PinDetails() {
   const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
-  const [pin] = useAtom(pinAtom);
-  const [, setIsEditing] = useAtom(isEditingAtom);
+  const [pinDetails] = useAtom(pinDetailsAtom);
+  const [drawerState, setDrawerState] = useAtom(drawerStateAtom);
 
-  const handleClick = (i: number) => {
+  const handleImageClick = (i: number) => {
     setIsLightBoxOpen(true);
     setSlideIndex(i);
   };
@@ -36,41 +36,41 @@ export default function Pin() {
     <div className='space-y-6 text-sm font-medium'>
       <div className='space-y-2'>
         <h2>Location</h2>
-        <p className=''>{pin?.location}</p>
+        <p className=''>{pinDetails?.location}</p>
       </div>
       <div className='space-y-2'>
         <h2>City</h2>
-        <p className=''>{pin?.city}</p>
+        <p className=''>{pinDetails?.city}</p>
       </div>
       <div className='space-y-2'>
         <h2>Region</h2>
-        <p className=''>{pin?.region}</p>
+        <p className=''>{pinDetails?.region}</p>
       </div>
       <div className='space-y-2'>
         <h2>Country</h2>
-        <p className=''>{pin?.country}</p>
+        <p className=''>{pinDetails?.country}</p>
       </div>
       <div className='space-y-2'>
         <h2>Date</h2>
-        <p className=''>{pin?.date?.toISOString().substring(0, 10)}</p>
+        <p className=''>{pinDetails?.date?.toISOString().substring(0, 10)}</p>
       </div>
       <div className='space-y-2'>
         <h2>Description</h2>
-        <p className=''>{pin?.description}</p>
+        <p className=''>{pinDetails?.description}</p>
       </div>
-      {pin && pin.photos.length > 0 && (
+      {pinDetails && pinDetails.photos.length > 0 && (
         <div className='space-y-2'>
           <h2>Photos</h2>
           <div className='grid grid-cols-3 gap-2'>
-            {pin?.photos.map((photo, i) => (
+            {pinDetails?.photos.map((photo, i) => (
               <Image
                 key={photo.id}
                 src={photo.url}
-                alt={pin.location}
+                alt={pinDetails.location}
                 width={140}
                 height={140}
                 className='aspect-square object-cover cursor-pointer'
-                onClick={() => handleClick(i)}
+                onClick={() => handleImageClick(i)}
               />
             ))}
           </div>
@@ -80,7 +80,7 @@ export default function Pin() {
         <button
           type='button'
           className='flex justify-center items-center gap-x-2 text-white bg-indigo-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24 mx-auto lg:mx-0 text-center'
-          onClick={() => setIsEditing(true)}
+          onClick={() => setDrawerState('edit')}
         >
           Edit
         </button>
@@ -95,7 +95,7 @@ export default function Pin() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>This action cannot be undone. This will permanently delete your pin and remove your data.</AlertDialogDescription>
+              <AlertDialogDescription>This action cannot be undone. This will permanently delete your pinDetails and remove your data.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className={'w-24 font-medium'}>Cancel</AlertDialogCancel>
@@ -107,9 +107,9 @@ export default function Pin() {
       <Lightbox
         open={isLightBoxOpen}
         close={() => setIsLightBoxOpen(false)}
-        slides={pin?.photos.map((photo) => ({ src: photo.url, alt: pin.location }))}
+        slides={pinDetails?.photos.map((photo) => ({ src: photo.url, alt: pinDetails.location }))}
         index={slideIndex}
-        plugins={pin && pin.photos.length > 1 ? [Zoom, Thumbnails] : [Zoom]}
+        plugins={pinDetails && pinDetails.photos.length > 1 ? [Zoom, Thumbnails] : [Zoom]}
         carousel={{ finite: true }}
       />
     </div>

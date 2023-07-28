@@ -2,16 +2,16 @@
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
-import Map, { Marker, type MapLayerMouseEvent, type MapRef, type MapEvent, MarkerEvent, MarkerDragEvent } from 'react-map-gl';
+import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl';
 import GeocoderControl from '@/components/geocoder';
 import { AnimatePresence, motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import AddPin from '@/app/map/[userId]/CreatePin';
-import type { PinDetails, UserWithPins } from '@/components/types';
+import type { PinDetails, PinWithPhotos, UserWithPins } from '@/components/types';
 import Image from 'next/image';
 import Drawer from './Drawer';
-import { pinAtom, isDrawerOpenAtom, drawerStateAtom, newPinAtom } from '@/lib/atoms';
+import { pinDetailsAtom, isDrawerOpenAtom, drawerStateAtom, newPinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
+import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
+import { Pin } from '@prisma/client';
 
 const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
 const ease = [[0.4, 0, 0.6, 1]];
@@ -25,13 +25,13 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
   const [newPin, setNewPin] = useAtom(newPinAtom);
   const [isDrawerOpen, setIsDrawerOpen] = useAtom(isDrawerOpenAtom);
   const [drawerState, setDrawerState] = useAtom(drawerStateAtom);
-  const [pin, setPin] = useAtom(pinAtom);
+  const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
 
   const mapRef = useRef<MapRef>(null);
 
   // create a new marker at clicked location
   const handleMapClick = async (e: MapLayerMouseEvent) => {
-    if (pin) return setPin(null);
+    // if (pin) return setPin(null);
     if (!drawerState) {
       if (newPin) return setNewPin(null);
       const latitude = e.lngLat.lat;
@@ -56,8 +56,17 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
 
       setNewPin({ ...newPin, location, city, region, country });
       mapRef.current?.easeTo({ center: [newPin.longitude, newPin.latitude], offset: [-240, 0] });
-      setDrawerState('');
+      setDrawerState('create');
+      setIsDrawerOpen(true);
     }
+  };
+
+  const handlePinClick = (e: MarkerEvent<mapboxgl.Marker, globalThis.MouseEvent>, pin: PinWithPhotos) => {
+    e.originalEvent.stopPropagation(); // stop add pin firing on existing pins
+    setIsDrawerOpen(true);
+    setDrawerState('details');
+    setPinDetails(pin);
+    mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
   };
 
   return (
@@ -91,11 +100,7 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
               latitude={pin.latitude}
               longitude={pin.longitude}
               offset={[0, -14]} //centering marker
-              onClick={(e) => {
-                e.originalEvent.stopPropagation(); // stop add pin firing on existing pins
-                setPin(pin);
-                mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
-              }}
+              onClick={(e) => handlePinClick(e, pin)}
             >
               <Image src='/images/marker_orange.svg' alt='marker_pin' width={32} height={48} />
             </Marker>
