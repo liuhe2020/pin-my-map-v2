@@ -55,5 +55,6 @@ export const env = createEnv({
     CLOUDINARY_CLOUDNAME: process.env.CLOUDINARY_CLOUDNAME,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+    NEXT_PUBLIC_MAPBOX: process.env.NEXT_PUBLIC_MAPBOX,
   },
 });

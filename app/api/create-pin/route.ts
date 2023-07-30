@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import prisma from '@/lib/prisma';
 import { CloudinaryImage } from '@/components/types';
-import { env } from '@/lib/env.mjs';
+import { env } from '@/env.mjs';
 
 cloudinary.config({
   cloud_name: env.CLOUDINARY_CLOUDNAME,

@@ -19,8 +19,8 @@ import { AiFillMinusCircle } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
 import { useAtom } from 'jotai';
 import { drawerStateAtom, newPinAtom } from '@/lib/atoms';
-import { mapBoxToken } from './MapInterface';
 import { useQuery } from '@tanstack/react-query';
+import { env } from '@/env.mjs';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -40,7 +40,9 @@ export default function CreatePin() {
   const [, setDrawerState] = useAtom(drawerStateAtom);
 
   const fetcher = async () => {
-    const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${newPin?.longitude},${newPin?.latitude}.json?access_token=${mapBoxToken}`);
+    const response = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${newPin?.longitude},${newPin?.latitude}.json?access_token=${env.NEXT_PUBLIC_MAPBOX}`
+    );
     return await response.json();
   };
 
@@ -216,37 +218,39 @@ export default function CreatePin() {
             </FormItem>
           )}
         />
-        <div className=''>
+        <div>
           <p className='text-sm font-medium'>Photos</p>
           <div {...getRootProps()} className='border border-input rounded-md mt-2 cursor-pointer group'>
             <div
               className={cn(
-                isDragActive && 'border-2',
-                'min-h-[160px] flex items-center justify-center m-1 border-2 border-white border-dashed rounded-md group-hover:border-indigo-500 transition-all duration-200'
+                isDragActive ? 'border-indigo-500' : 'border-white',
+                'min-h-[160px] flex items-center justify-center m-1 border-2 border-dashed rounded-md group-hover:border-indigo-500 transition-all duration-200'
               )}
             >
               {/* <input {...getInputProps()} /> */}
-              {files.length > 0 && (
-                <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'grid grid-cols-3 p-6 gap-6 transition-all duration-400')}>
-                  {files.map((file, index) => (
-                    <div key={index} className='relative'>
-                      <div className='relative'>
-                        <Image src={file} alt='preview' width={120} height={120} className='aspect-square object-cover rounded-md' />
+              <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'transition-all duration-400')}>
+                {files.length > 0 && (
+                  <div className='grid grid-cols-3 p-6 gap-6'>
+                    {files.map((file, index) => (
+                      <div key={index} className='relative'>
+                        <div className='relative'>
+                          <Image src={file} alt='preview' width={120} height={120} className='aspect-square object-cover rounded-md' />
+                        </div>
+                        <AiFillMinusCircle
+                          className='absolute -top-3 -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
+                          onClick={(e) => handleRemovePhoto(e, index)}
+                        />
                       </div>
-                      <AiFillMinusCircle
-                        className='absolute -top-3 -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
-                        onClick={(e) => handleRemovePhoto(e, index)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-              {files.length === 0 && (
-                <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'flex flex-col items-center gap-y-2 my-auto transition-all duration-400')}>
-                  <p className='text-sm font-medium'>Click to select photos, or drag and drop here</p>
-                  <BiSolidCloudUpload className='w-6 h-6 text-indigo-500' />
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+                {files.length === 0 && (
+                  <div className='flex flex-col items-center gap-y-2 my-auto'>
+                    <p className='text-sm font-medium'>Click to select photos, or drag and drop here</p>
+                    <BiSolidCloudUpload className='w-6 h-6 text-indigo-500' />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

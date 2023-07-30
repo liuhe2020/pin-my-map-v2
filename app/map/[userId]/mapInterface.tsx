@@ -1,9 +1,9 @@
 'use client';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl';
-import GeocoderControl from '@/components/geocoder';
+import GeocoderControl from '@/components/GeocoderControl';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { PinWithPhotos, UserWithPins } from '@/components/types';
 import Image from 'next/image';
@@ -11,9 +11,7 @@ import Drawer from './Drawer';
 import { pinDetailsAtom, isDrawerOpenAtom, drawerStateAtom, newPinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
-import { Pin } from '@prisma/client';
-import { useQuery } from '@tanstack/react-query';
-import { env } from '@/lib/env.mjs';
+import { env } from '@/env.mjs';
 
 const ease = [[0.4, 0, 0.6, 1]];
 
