@@ -25,11 +25,11 @@ export async function POST(request: Request) {
     const newPin = await prisma.pin.create({
       data: {
         location: pin.location,
-        city: pin.city ? pin.city : null,
-        region: pin.region ? pin.region : null,
-        country: pin.country ? pin.country : null,
-        description: pin.description ? pin.description : null,
-        date: pin.date ? pin.date : null,
+        city: pin.city || null,
+        region: pin.region || null,
+        country: pin.country || null,
+        description: pin.description || null,
+        date: pin.date || null,
         latitude: pin.latitude,
         longitude: pin.longitude,
         userId: session.user.id,

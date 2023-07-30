@@ -5,15 +5,16 @@ import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'rea
 import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl';
 import GeocoderControl from '@/components/geocoder';
 import { AnimatePresence, motion } from 'framer-motion';
-import type { PinDetails, PinWithPhotos, UserWithPins } from '@/components/types';
+import type { PinWithPhotos, UserWithPins } from '@/components/types';
 import Image from 'next/image';
 import Drawer from './Drawer';
 import { pinDetailsAtom, isDrawerOpenAtom, drawerStateAtom, newPinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
 import { Pin } from '@prisma/client';
+import { useQuery } from '@tanstack/react-query';
 
-const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX!;
+export const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX ?? '';
 const ease = [[0.4, 0, 0.6, 1]];
 
 export default function MapInterface({ user }: { user: UserWithPins | null }) {
@@ -25,7 +26,7 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
   const [newPin, setNewPin] = useAtom(newPinAtom);
   const [isDrawerOpen, setIsDrawerOpen] = useAtom(isDrawerOpenAtom);
   const [drawerState, setDrawerState] = useAtom(drawerStateAtom);
-  const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
+  const [, setPinDetails] = useAtom(pinDetailsAtom);
 
   const mapRef = useRef<MapRef>(null);
 
@@ -41,24 +42,10 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
   };
 
   const handleNewPinClick = async () => {
-    if (newPin) {
-      const getPlace = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${newPin.longitude},${newPin.latitude}.json?access_token=${mapBoxToken}`);
-      const place = await getPlace.json();
-
-      const location =
-        place.features.find((i: { id: string }) => i.id.includes('poi'))?.text ||
-        place.features.find((i: { id: string }) => i.id.includes('neighborhood'))?.text ||
-        place.features.find((i: { id: string }) => i.id.includes('locality'))?.text ||
-        '';
-      const city = place.features.find((i: { id: string }) => i.id.includes('place'))?.text || '';
-      const region = place.features.find((i: { id: string }) => i.id.includes('region'))?.text || '';
-      const country = place.features.find((i: { id: string }) => i.id.includes('country'))?.text || '';
-
-      setNewPin({ ...newPin, location, city, region, country });
-      mapRef.current?.easeTo({ center: [newPin.longitude, newPin.latitude], offset: [-240, 0] });
-      setDrawerState('create');
-      setIsDrawerOpen(true);
-    }
+    if (!newPin) return;
+    mapRef.current?.easeTo({ center: [newPin.longitude, newPin.latitude], offset: [-240, 0] });
+    setDrawerState('create');
+    setIsDrawerOpen(true);
   };
 
   const handlePinClick = (e: MarkerEvent<mapboxgl.Marker, globalThis.MouseEvent>, pin: PinWithPhotos) => {

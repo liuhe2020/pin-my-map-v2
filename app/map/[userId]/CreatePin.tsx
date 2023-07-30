@@ -19,6 +19,8 @@ import { AiFillMinusCircle } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
 import { useAtom } from 'jotai';
 import { drawerStateAtom, newPinAtom } from '@/lib/atoms';
+import { mapBoxToken } from './MapInterface';
+import { useQuery } from '@tanstack/react-query';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -37,15 +39,37 @@ export default function CreatePin() {
   const [newPin, setNewPin] = useAtom(newPinAtom);
   const [, setDrawerState] = useAtom(drawerStateAtom);
 
-  console.log(newPin);
+  const fetcher = async () => {
+    const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${newPin?.longitude},${newPin?.latitude}.json?access_token=${mapBoxToken}`);
+    return await response.json();
+  };
+
+  const {
+    data: place,
+    isLoading: isNewPinLoading,
+    refetch,
+  } = useQuery(['place'], fetcher, {
+    onSuccess: (place) => {
+      // change default value of form once available from api fetch
+      const location =
+        place.features.find((i: { id: string }) => i.id.includes('poi'))?.text ||
+        place.features.find((i: { id: string }) => i.id.includes('neighborhood'))?.text ||
+        place.features.find((i: { id: string }) => i.id.includes('locality'))?.text ||
+        '';
+      const city = place.features.find((i: { id: string }) => i.id.includes('place'))?.text || '';
+      const region = place.features.find((i: { id: string }) => i.id.includes('region'))?.text || '';
+      const country = place.features.find((i: { id: string }) => i.id.includes('country'))?.text || '';
+      form.reset({ location, city, region, country });
+    },
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      location: newPin?.location,
-      city: newPin?.city,
-      region: newPin?.region,
-      country: newPin?.country,
+      location: '',
+      city: '',
+      region: '',
+      country: '',
       date: undefined,
       description: '',
     },
@@ -76,7 +100,7 @@ export default function CreatePin() {
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
+    // setIsLoading(true);
     const response = await fetch('/api/create-pin', {
       method: 'POST',
       headers: {
@@ -89,7 +113,7 @@ export default function CreatePin() {
     } else {
       alert('all good');
     }
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   return (
