@@ -35,6 +35,9 @@ dependencies:
   '@radix-ui/react-slot':
     specifier: ^1.0.2
     version: 1.0.2(@types/react@18.2.17)(react@18.2.0)
+  '@t3-oss/env-nextjs':
+    specifier: ^0.6.0
+    version: 0.6.0(typescript@5.1.6)(zod@3.21.4)
   '@tanstack/react-query':
     specifier: ^4.32.0
     version: 4.32.0(react-dom@18.2.0)(react@18.2.0)
@@ -1420,6 +1423,27 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       defer-to-connect: 2.0.1
+    dev: false
+
+  /@t3-oss/env-core@0.6.0(typescript@5.1.6)(zod@3.21.4):
+    resolution: {integrity: sha512-3FkPAba069WRZVVab/sB1m3eSGn/rZeypx5k+sWEu1d+k0OQdRDnvFS+7MtxYgqVrwaRk3b7yVnX2dgSPVmWPQ==}
+    peerDependencies:
+      typescript: '>=4.7.2'
+      zod: ^3.0.0
+    dependencies:
+      typescript: 5.1.6
+      zod: 3.21.4
+    dev: false
+
+  /@t3-oss/env-nextjs@0.6.0(typescript@5.1.6)(zod@3.21.4):
+    resolution: {integrity: sha512-SpzcGNIbUYcQw4zPPFeRJqCC1560zL7QmB0puIqOnuCsmykPkqHPX+n9CNZLXVQerboHzfvb7Kd+jAdouk72Vw==}
+    peerDependencies:
+      typescript: '>=4.7.2'
+      zod: ^3.0.0
+    dependencies:
+      '@t3-oss/env-core': 0.6.0(typescript@5.1.6)(zod@3.21.4)
+      typescript: 5.1.6
+      zod: 3.21.4
     dev: false
 
   /@tanstack/query-core@4.32.0:
@@ -4931,7 +4955,6 @@ packages:
     resolution: {integrity: sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==}
     engines: {node: '>=14.17'}
     hasBin: true
-    dev: true
 
   /typewise-core@1.2.0:
     resolution: {integrity: sha512-2SCC/WLzj2SbUwzFOzqMCkz5amXLlxtJqDKTICqg30x+2DZxcfZN2MvQZmGfXWKNWaKK9pBPsvkcwv8bF/gxKg==}

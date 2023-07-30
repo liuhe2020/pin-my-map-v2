@@ -118,7 +118,7 @@ export default function CreatePin() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
         <FormField
           control={form.control}
           name='location'
@@ -222,7 +222,7 @@ export default function CreatePin() {
             <div
               className={cn(
                 isDragActive && 'border-2',
-                'min-h-[160px] flex items-center justify-center m-1 group-hover:border-2 border-dashed border-indigo-500 rounded-md'
+                'min-h-[160px] flex items-center justify-center m-1 border-2 border-white border-dashed rounded-md group-hover:border-indigo-500 transition-all duration-200'
               )}
             >
               {/* <input {...getInputProps()} /> */}

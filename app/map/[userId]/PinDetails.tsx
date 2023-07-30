@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
 export default function PinDetails() {
   const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function PinDetails() {
   };
 
   return (
-    <div className='space-y-6 text-sm font-medium'>
+    <div className='space-y-4 text-sm font-medium'>
       <div className='space-y-2'>
         <h2>Location</h2>
         <p className=''>{pinDetails?.location}</p>
@@ -77,18 +78,12 @@ export default function PinDetails() {
         </div>
       )}
       <div className='flex gap-x-2'>
-        <button
-          type='button'
-          className='flex justify-center items-center gap-x-2 text-white bg-indigo-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24 mx-auto lg:mx-0 text-center'
-          onClick={() => setDrawerState('edit')}
-        >
+        <Button type='submit' className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'} onClick={() => setDrawerState('edit')}>
           Edit
-        </button>
+        </Button>
         <AlertDialog>
           <AlertDialogTrigger
-            className={
-              'flex justify-center items-center gap-x-2 text-white bg-red-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24 mx-auto lg:mx-0 text-center'
-            }
+            className={'flex justify-center items-center text-white bg-red-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24'}
           >
             Delete
           </AlertDialogTrigger>

@@ -13,8 +13,8 @@ import { useAtom } from 'jotai';
 import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
 import { Pin } from '@prisma/client';
 import { useQuery } from '@tanstack/react-query';
+import { env } from '@/lib/env.mjs';
 
-export const mapBoxToken = process.env.NEXT_PUBLIC_MAPBOX ?? '';
 const ease = [[0.4, 0, 0.6, 1]];
 
 export default function MapInterface({ user }: { user: UserWithPins | null }) {
@@ -63,14 +63,14 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
           ref={mapRef}
           {...viewState}
           onMove={(evt) => setViewState(evt.viewState)}
-          mapboxAccessToken={mapBoxToken}
+          mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX}
           doubleClickZoom={false}
           mapStyle='mapbox://styles/liuhe2020/cktu2h4q70wil17m6umh33a9i'
           minZoom={1.585} // limit zoom out to single world map
           maxZoom={19}
           onClick={handleMapClick}
         >
-          <GeocoderControl mapboxAccessToken={mapBoxToken} position='top-left' />
+          <GeocoderControl mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX} position='top-left' />
           {newPin && (
             <Marker
               latitude={newPin.latitude}

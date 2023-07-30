@@ -4,11 +4,12 @@ import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import prisma from '@/lib/prisma';
 import { CloudinaryImage } from '@/components/types';
+import { env } from '@/lib/env.mjs';
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUDNAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: env.CLOUDINARY_CLOUDNAME,
+  api_key: env.CLOUDINARY_API_KEY,
+  api_secret: env.CLOUDINARY_API_SECRET,
   secure: true,
 });
 
