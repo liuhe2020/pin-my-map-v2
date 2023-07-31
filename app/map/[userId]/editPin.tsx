@@ -19,7 +19,7 @@ import { AiFillMinusCircle } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
 import { useAtom } from 'jotai';
 import { pinDetailsAtom } from '@/lib/atoms';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -35,30 +35,7 @@ const formSchema = z.object({
 export default function EditPin() {
   const [files, setFiles] = useState<string[]>([]);
   const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
-
-  // const fetcher = async () => {
-  //   const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${newPin?.longitude},${newPin?.latitude}.json?access_token=${mapBoxToken}`);
-  //   return await response.json();
-  // };
-
-  // const {
-  //   data: place,
-  //   isLoading: isNewPinLoading,
-  //   refetch,
-  // } = useQuery(['place'], fetcher, {
-  //   onSuccess: (place) => {
-  //     // change default value of form once available from api fetch
-  //     const location =
-  //       place.features.find((i: { id: string }) => i.id.includes('poi'))?.text ||
-  //       place.features.find((i: { id: string }) => i.id.includes('neighborhood'))?.text ||
-  //       place.features.find((i: { id: string }) => i.id.includes('locality'))?.text ||
-  //       '';
-  //     const city = place.features.find((i: { id: string }) => i.id.includes('place'))?.text || '';
-  //     const region = place.features.find((i: { id: string }) => i.id.includes('region'))?.text || '';
-  //     const country = place.features.find((i: { id: string }) => i.id.includes('country'))?.text || '';
-  //     form.reset({ location, city, region, country });
-  //   },
-  // });
+  const [deletePhotos, setDeletePhotos] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -90,11 +67,28 @@ export default function EditPin() {
     },
   });
 
+  const handleRemoveExsistingPhoto = (e: MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (pinDetails && pinDetails.photos.length > 0) {
+      const pinDetailsWithPhotosRemoved = { ...pinDetails, photos: pinDetails.photos.filter((photo) => photo.id !== id) };
+      setPinDetails(pinDetailsWithPhotosRemoved);
+      setDeletePhotos((prev) => [...prev, id]);
+    }
+  };
+
   const handleRemovePhoto = (e: MouseEvent, index: number) => {
     e.stopPropagation();
     const filteredFiles = files.filter((i, idx) => idx !== index);
     setFiles(filteredFiles);
   };
+
+  const mutation = useMutation((values: z.infer<typeof formSchema>) =>
+    fetch('/api/update-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: values, deletePhotos, files }),
+    })
+  );
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // setIsLoading(true);
@@ -235,7 +229,7 @@ export default function EditPin() {
                           </div>
                           <AiFillMinusCircle
                             className='absolute -top-3 -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
-                            onClick={(e) => handleRemovePhoto(e, index)}
+                            onClick={(e) => handleRemoveExsistingPhoto(e, photo.id)}
                           />
                         </div>
                       ))}
