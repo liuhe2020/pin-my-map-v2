@@ -21,16 +21,31 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useMutation } from '@tanstack/react-query';
 
 export default function PinDetails() {
   const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
   const [pinDetails] = useAtom(pinDetailsAtom);
-  const [drawerState, setDrawerState] = useAtom(drawerStateAtom);
+  const [, setDrawerState] = useAtom(drawerStateAtom);
 
   const handleImageClick = (i: number) => {
     setIsLightBoxOpen(true);
     setSlideIndex(i);
+  };
+
+  const mutation = useMutation((id: string) =>
+    fetch('/api/delete-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(id),
+    })
+  );
+
+  const handleDeleteClick = () => {
+    if (pinDetails) {
+      mutation.mutate(pinDetails.id);
+    }
   };
 
   return (
@@ -90,11 +105,15 @@ export default function PinDetails() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>This action cannot be undone. This will permanently delete your pinDetails and remove your data.</AlertDialogDescription>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this pin from your map and remove its data.
+              </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className={'w-24 font-medium'}>Cancel</AlertDialogCancel>
-              <AlertDialogAction className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'}>Delete</AlertDialogAction>
+              <AlertDialogAction className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'} onClick={handleDeleteClick}>
+                Delete
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
