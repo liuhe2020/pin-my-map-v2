@@ -86,25 +86,12 @@ export default function EditPin() {
     fetch('/api/update-pin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin: values, deletePhotos, files }),
+      body: JSON.stringify({ pin: { ...values, id: pinDetails?.id }, deletePhotos, files }),
     })
   );
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // setIsLoading(true);
-    const response = await fetch('/api/create-pin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ pin: { ...values, latitude: pinDetails?.latitude, longitude: pinDetails?.longitude }, files }),
-    });
-    if (response.status !== 200) {
-      alert('failed');
-    } else {
-      alert('all good');
-    }
-    // setIsLoading(false);
+    mutation.mutate(values);
   };
 
   return (
