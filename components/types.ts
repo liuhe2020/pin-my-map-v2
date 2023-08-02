@@ -27,7 +27,7 @@ export interface CloudinaryImage {
   api_key: string;
 }
 
-const userWithPins = Prisma.validator<Prisma.UserArgs>()({
+const userWithPins = Prisma.validator<Prisma.UserDefaultArgs>()({
   include: {
     pins: {
       include: {
@@ -42,7 +42,7 @@ const userWithPins = Prisma.validator<Prisma.UserArgs>()({
   },
 });
 
-const pinWithPhotos = Prisma.validator<Prisma.PinArgs>()({
+const pinWithPhotos = Prisma.validator<Prisma.PinDefaultArgs>()({
   include: {
     photos: {
       select: {
