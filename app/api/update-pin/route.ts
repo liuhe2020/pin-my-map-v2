@@ -13,7 +13,7 @@ cloudinary.config({
   secure: true,
 });
 
-export async function POST(request: Request) {
+export async function PATCH(request: Request) {
   // get user/session
   const session = await getServerSession(authOptions);
 

@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useMutation } from '@tanstack/react-query';
+import { queryClient } from '@/components/ReactQueryProvider';
 
 export default function PinDetails() {
   const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
@@ -34,9 +35,9 @@ export default function PinDetails() {
     setSlideIndex(i);
   };
 
-  const mutation = useMutation((id: string) =>
+  const deletePin = useMutation((id: string) =>
     fetch('/api/delete-pin', {
-      method: 'POST',
+      method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(id),
     })
@@ -44,7 +45,7 @@ export default function PinDetails() {
 
   const handleDeleteClick = () => {
     if (pinDetails) {
-      mutation.mutate(pinDetails.id);
+      deletePin.mutate(pinDetails.id, { onSuccess: () => queryClient.invalidateQueries(['user']) });
     }
   };
 
@@ -93,7 +94,7 @@ export default function PinDetails() {
         </div>
       )}
       <div className='flex gap-x-2'>
-        <Button type='submit' className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'} onClick={() => setDrawerState('edit')}>
+        <Button onClick={() => setDrawerState('edit')} type='submit' className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}>
           Edit
         </Button>
         <AlertDialog>
@@ -111,7 +112,7 @@ export default function PinDetails() {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel className={'w-24 font-medium'}>Cancel</AlertDialogCancel>
-              <AlertDialogAction className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'} onClick={handleDeleteClick}>
+              <AlertDialogAction onClick={handleDeleteClick} className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'}>
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>

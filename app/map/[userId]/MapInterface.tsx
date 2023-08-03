@@ -12,10 +12,11 @@ import { pinDetailsAtom, isDrawerOpenAtom, drawerStateAtom, newPinAtom } from '@
 import { useAtom } from 'jotai';
 import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
 import { env } from '@/env.mjs';
+import { useQuery } from '@tanstack/react-query';
 
 const ease = [[0.4, 0, 0.6, 1]];
 
-export default function MapInterface({ user }: { user: UserWithPins | null }) {
+export default function MapInterface({ userId }: { userId: string }) {
   const [viewState, setViewState] = useState({
     latitude: 46,
     longitude: 17,
@@ -25,6 +26,17 @@ export default function MapInterface({ user }: { user: UserWithPins | null }) {
   const [isDrawerOpen, setIsDrawerOpen] = useAtom(isDrawerOpenAtom);
   const [drawerState, setDrawerState] = useAtom(drawerStateAtom);
   const [, setPinDetails] = useAtom(pinDetailsAtom);
+
+  const fetcher = async (): Promise<UserWithPins> => {
+    const response = await fetch('/api/get-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userId),
+    });
+    return await response.json();
+  };
+
+  const { data: user } = useQuery(['user'], () => fetcher());
 
   const mapRef = useRef<MapRef>(null);
 

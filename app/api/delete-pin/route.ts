@@ -12,7 +12,7 @@ cloudinary.config({
   secure: true,
 });
 
-export async function POST(request: Request) {
+export async function DELETE(request: Request) {
   // get user/session
   const session = await getServerSession(authOptions);
 

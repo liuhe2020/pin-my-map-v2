@@ -19,8 +19,9 @@ import { AiFillMinusCircle } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
 import { useAtom } from 'jotai';
 import { drawerStateAtom, newPinAtom } from '@/lib/atoms';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { env } from '@/env.mjs';
+import { queryClient } from '@/components/ReactQueryProvider';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -47,7 +48,7 @@ export default function CreatePin() {
   };
 
   const {
-    data: place,
+    data,
     isLoading: isNewPinLoading,
     refetch,
   } = useQuery(['place'], fetcher, {
@@ -101,21 +102,18 @@ export default function CreatePin() {
     setFiles(filteredFiles);
   };
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // setIsLoading(true);
-    const response = await fetch('/api/create-pin', {
+  const createPin = useMutation((values: z.infer<typeof formSchema>) =>
+    fetch('/api/create-pin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ pin: { ...values, latitude: newPin?.latitude, longitude: newPin?.longitude }, files }),
-    });
-    if (response.status !== 200) {
-      alert('failed');
-    } else {
-      alert('all good');
-    }
-    // setIsLoading(false);
+    })
+  );
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    createPin.mutate(values, { onSuccess: () => queryClient.invalidateQueries(['user']) });
   };
 
   return (

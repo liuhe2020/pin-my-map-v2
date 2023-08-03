@@ -21,23 +21,5 @@ export async function generateMetadata({ params: { userId } }: Props) {
 }
 
 export default async function UserMapPage({ params: { userId } }: Props) {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    include: {
-      pins: {
-        include: {
-          photos: {
-            select: {
-              id: true,
-              url: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  return <MapInterface user={user} />;
+  return <MapInterface userId={userId} />;
 }

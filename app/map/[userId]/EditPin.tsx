@@ -20,6 +20,7 @@ import { BiSolidCloudUpload } from 'react-icons/bi';
 import { useAtom } from 'jotai';
 import { pinDetailsAtom } from '@/lib/atoms';
 import { useMutation } from '@tanstack/react-query';
+import { queryClient } from '@/components/ReactQueryProvider';
 
 const formSchema = z.object({
   location: z.string().min(2, {
@@ -82,16 +83,16 @@ export default function EditPin() {
     setFiles(filteredFiles);
   };
 
-  const mutation = useMutation((values: z.infer<typeof formSchema>) =>
+  const eidtPin = useMutation((values: z.infer<typeof formSchema>) =>
     fetch('/api/update-pin', {
-      method: 'POST',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pin: { ...values, id: pinDetails?.id }, deletePhotos, files }),
     })
   );
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    mutation.mutate(values);
+    eidtPin.mutate(values, { onSuccess: () => queryClient.invalidateQueries(['user']) });
   };
 
   return (
