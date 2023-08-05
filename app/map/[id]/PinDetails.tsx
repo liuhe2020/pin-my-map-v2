@@ -2,7 +2,7 @@
 
 import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/thumbnails.css';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { drawerStateAtom, pinDetailsAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import Image from 'next/image';
@@ -21,31 +21,30 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/components/ReactQueryProvider';
+import { useRouter } from 'next/navigation';
+import { deletePinAction } from '@/app/actions';
 
 export default function PinDetails() {
   const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
   const [pinDetails] = useAtom(pinDetailsAtom);
   const [, setDrawerState] = useAtom(drawerStateAtom);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleImageClick = (i: number) => {
     setIsLightBoxOpen(true);
     setSlideIndex(i);
   };
 
-  const deletePin = useMutation((id: string) =>
-    fetch('/api/delete-pin', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(id),
-    })
-  );
-
   const handleDeleteClick = () => {
     if (pinDetails) {
-      deletePin.mutate(pinDetails.id, { onSuccess: () => queryClient.invalidateQueries(['user']) });
+      // server action
+      startTransition(async () => {
+        const response = await deletePinAction(pinDetails.id);
+        if (response?.error) return alert('ERROR');
+        router.refresh();
+      });
     }
   };
 
@@ -99,6 +98,7 @@ export default function PinDetails() {
         </Button>
         <AlertDialog>
           <AlertDialogTrigger
+            disabled={isPending}
             className={'flex justify-center items-center text-white bg-red-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24'}
           >
             Delete
@@ -111,8 +111,14 @@ export default function PinDetails() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className={'w-24 font-medium'}>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteClick} className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'}>
+              <AlertDialogCancel disabled={isPending} className={'w-24 font-medium'}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteClick}
+                disabled={isPending}
+                className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'}
+              >
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>

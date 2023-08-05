@@ -1,9 +1,9 @@
-import { NewPin, PinWithPhotos } from '@/components/types';
+import type { LatLng, PinWithPhotos } from '@/components/types';
 import { atom } from 'jotai';
 
 const pinDetailsAtom = atom<PinWithPhotos | null>(null);
 
-const newPinAtom = atom<NewPin | null>(null);
+const newPinAtom = atom<LatLng | null>(null);
 
 const isDrawerOpenAtom = atom(false);
 

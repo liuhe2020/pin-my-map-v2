@@ -12,33 +12,25 @@ import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '../../../components/ui/calendar';
 import { format } from 'date-fns';
 import { Textarea } from '../../../components/ui/textarea';
-import { MouseEvent, useCallback, useState } from 'react';
+import { type MouseEvent, useCallback, useState, useTransition } from 'react';
 import { useDropzone, type FileWithPath } from 'react-dropzone';
 import Image from 'next/image';
 import { AiFillMinusCircle } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
 import { useAtom } from 'jotai';
 import { drawerStateAtom, newPinAtom } from '@/lib/atoms';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { env } from '@/env.mjs';
-import { queryClient } from '@/components/ReactQueryProvider';
-
-const formSchema = z.object({
-  location: z.string().min(2, {
-    message: 'Minimum 2 characters.',
-  }),
-  city: z.string(),
-  region: z.string(),
-  country: z.string(),
-  date: z.date().optional(),
-  description: z.string().optional(),
-});
+import { createPinAction } from '@/app/actions';
+import { formSchema } from '@/lib/formSchema';
+import { useRouter } from 'next/navigation';
 
 export default function CreatePin() {
-  const [isLoading, setIsLoading] = useState(false);
   const [files, setFiles] = useState<string[]>([]);
   const [newPin, setNewPin] = useAtom(newPinAtom);
   const [, setDrawerState] = useAtom(drawerStateAtom);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const fetcher = async () => {
     const response = await fetch(
@@ -47,11 +39,7 @@ export default function CreatePin() {
     return await response.json();
   };
 
-  const {
-    data,
-    isLoading: isNewPinLoading,
-    refetch,
-  } = useQuery(['place'], fetcher, {
+  const { data, isLoading: isNewPinLoading } = useQuery(['place'], fetcher, {
     onSuccess: (place) => {
       // change default value of form once available from api fetch
       const location =
@@ -102,18 +90,16 @@ export default function CreatePin() {
     setFiles(filteredFiles);
   };
 
-  const createPin = useMutation((values: z.infer<typeof formSchema>) =>
-    fetch('/api/create-pin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ pin: { ...values, latitude: newPin?.latitude, longitude: newPin?.longitude }, files }),
-    })
-  );
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    createPin.mutate(values, { onSuccess: () => queryClient.invalidateQueries(['user']) });
+    if (newPin) {
+      const pin = { ...values, latitude: newPin.latitude, longitude: newPin.longitude };
+      // server action
+      startTransition(async () => {
+        const response = await createPinAction(pin, files);
+        if (response?.error) return alert('ERROR');
+        router.refresh();
+      });
+    }
   };
 
   return (
@@ -252,7 +238,7 @@ export default function CreatePin() {
             </div>
           </div>
         </div>
-        <Button type='submit' className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}>
+        <Button type='submit' disabled={isPending} className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}>
           Submit
         </Button>
       </form>

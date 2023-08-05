@@ -12,31 +12,23 @@ import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '../../../components/ui/calendar';
 import { format } from 'date-fns';
 import { Textarea } from '../../../components/ui/textarea';
-import { MouseEvent, useCallback, useState } from 'react';
+import { type MouseEvent, useCallback, useState, useTransition } from 'react';
 import { useDropzone, type FileWithPath } from 'react-dropzone';
 import Image from 'next/image';
 import { AiFillMinusCircle } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
 import { useAtom } from 'jotai';
 import { pinDetailsAtom } from '@/lib/atoms';
-import { useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/components/ReactQueryProvider';
-
-const formSchema = z.object({
-  location: z.string().min(2, {
-    message: 'Minimum 2 characters.',
-  }),
-  city: z.string(),
-  region: z.string(),
-  country: z.string(),
-  date: z.date().optional(),
-  description: z.string().optional(),
-});
+import { formSchema } from '@/lib/formSchema';
+import { useRouter } from 'next/navigation';
+import { editPinAction } from '@/app/actions';
 
 export default function EditPin() {
   const [files, setFiles] = useState<string[]>([]);
   const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
   const [deletePhotos, setDeletePhotos] = useState<string[]>([]);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,16 +75,16 @@ export default function EditPin() {
     setFiles(filteredFiles);
   };
 
-  const eidtPin = useMutation((values: z.infer<typeof formSchema>) =>
-    fetch('/api/update-pin', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin: { ...values, id: pinDetails?.id }, deletePhotos, files }),
-    })
-  );
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    eidtPin.mutate(values, { onSuccess: () => queryClient.invalidateQueries(['user']) });
+    if (pinDetails) {
+      const pin = { ...values, id: pinDetails.id };
+      // server action
+      startTransition(async () => {
+        const response = await editPinAction(pin, deletePhotos, files);
+        if (response?.error) return alert('ERROR');
+        router.refresh();
+      });
+    }
   };
 
   return (

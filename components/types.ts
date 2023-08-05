@@ -1,9 +1,21 @@
 import { Prisma } from '@prisma/client';
 
-export interface NewPin {
+export interface LatLng {
   latitude: number;
   longitude: number;
 }
+
+export interface PinValues {
+  location: string;
+  city?: string;
+  region?: string;
+  country?: string;
+  date?: Date;
+  description?: string;
+  id?: string;
+}
+
+export interface NewPinValues extends PinValues, LatLng {}
 
 export interface CloudinaryImage {
   asset_id: string;
