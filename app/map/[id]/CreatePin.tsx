@@ -18,7 +18,7 @@ import Image from 'next/image';
 import { AiFillMinusCircle } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
 import { useAtom } from 'jotai';
-import { drawerStateAtom, newPinAtom } from '@/lib/atoms';
+import { drawerAtom, newPinAtom } from '@/lib/atoms';
 import { useQuery } from '@tanstack/react-query';
 import { env } from '@/env.mjs';
 import { createPinAction } from '@/app/actions';
@@ -28,7 +28,7 @@ import { useRouter } from 'next/navigation';
 export default function CreatePin() {
   const [files, setFiles] = useState<string[]>([]);
   const [newPin, setNewPin] = useAtom(newPinAtom);
-  const [, setDrawerState] = useAtom(drawerStateAtom);
+  const [, setDrawerState] = useAtom(drawerAtom);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 

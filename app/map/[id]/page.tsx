@@ -8,19 +8,17 @@ import { notFound } from 'next/navigation';
 //   return users.map((user) => ({ id: user.id }));
 // }
 
-// export async function generateMetadata({ params: { userId } }: Props) {
-//   const user = await prisma.user.findUnique({
-//     where: {
-//       id: userId,
-//     },
-//   });
+export async function generateMetadata({ params: { id } }: { params: { id: string } }) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
 
-//   return {
-//     title: `${user?.name}'s Map`,
-//   };
-// }
-
-// export const revalidate = 0;
+  return {
+    title: `${user && user.name ? user.name : 'User'}'s Map`,
+  };
+}
 
 export default async function UserMapPage({ params: { id } }: { params: { id: string } }) {
   const user = await prisma.user.findUnique({

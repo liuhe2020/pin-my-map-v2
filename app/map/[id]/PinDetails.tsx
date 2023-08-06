@@ -3,7 +3,7 @@
 import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/thumbnails.css';
 import { useState, useTransition } from 'react';
-import { drawerStateAtom, pinDetailsAtom } from '@/lib/atoms';
+import { drawerAtom, pinDetailsAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import Image from 'next/image';
 import { Lightbox } from 'yet-another-react-lightbox';
@@ -28,7 +28,7 @@ export default function PinDetails() {
   const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
   const [pinDetails] = useAtom(pinDetailsAtom);
-  const [, setDrawerState] = useAtom(drawerStateAtom);
+  const [, setDrawer] = useAtom(drawerAtom);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -93,7 +93,11 @@ export default function PinDetails() {
         </div>
       )}
       <div className='flex gap-x-2'>
-        <Button onClick={() => setDrawerState('edit')} type='submit' className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}>
+        <Button
+          onClick={() => setDrawer((prev) => ({ ...prev, state: 'edit' }))}
+          type='submit'
+          className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}
+        >
           Edit
         </Button>
         <AlertDialog>
@@ -106,9 +110,7 @@ export default function PinDetails() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete this pin from your map and remove its data.
-              </AlertDialogDescription>
+              <AlertDialogDescription>This will permanently delete the pin from your map. This action cannot be undone.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isPending} className={'w-24 font-medium'}>

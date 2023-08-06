@@ -5,8 +5,6 @@ const pinDetailsAtom = atom<PinWithPhotos | null>(null);
 
 const newPinAtom = atom<LatLng | null>(null);
 
-const isDrawerOpenAtom = atom(false);
+const drawerAtom = atom({ isOpen: false, state: '' }); // state values: details | create | edit
 
-const drawerStateAtom = atom(''); // values: details | create | edit
-
-export { pinDetailsAtom, newPinAtom, isDrawerOpenAtom, drawerStateAtom };
+export { pinDetailsAtom, newPinAtom, drawerAtom };

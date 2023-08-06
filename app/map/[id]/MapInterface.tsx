@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { PinWithPhotos, UserWithPins } from '@/components/types';
 import Image from 'next/image';
 import Drawer from './Drawer';
-import { pinDetailsAtom, isDrawerOpenAtom, drawerStateAtom, newPinAtom } from '@/lib/atoms';
+import { pinDetailsAtom, drawerAtom, newPinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import type { MarkerEvent, ViewStateChangeEvent } from 'react-map-gl/dist/esm/types';
 import { env } from '@/env.mjs';
@@ -24,8 +24,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
   });
   const [cursor, setCursor] = useState('default');
   const [newPin, setNewPin] = useAtom(newPinAtom);
-  const [isDrawerOpen, setIsDrawerOpen] = useAtom(isDrawerOpenAtom);
-  const [drawerState, setDrawerState] = useAtom(drawerStateAtom);
+  const [drawer, setDrawer] = useAtom(drawerAtom);
   const [, setPinDetails] = useAtom(pinDetailsAtom);
 
   const mapRef = useRef<MapRef>(null);
@@ -33,25 +32,26 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
   // create a new marker at clicked location
   const handleMapClick = async (e: MapLayerMouseEvent) => {
     // if (pin) return setPin(null);
-    if (!drawerState) {
-      if (newPin) return setNewPin(null);
-      const latitude = e.lngLat.lat;
-      const longitude = e.lngLat.lng;
-      setNewPin({ latitude, longitude });
+    if (drawer.isOpen === false) {
+      if (newPin) {
+        return setNewPin(null);
+      }
+      return setNewPin({ latitude: e.lngLat.lat, longitude: e.lngLat.lng });
+    }
+    if (drawer.state === 'details') {
+      setDrawer((prev) => ({ ...prev, isOpen: false }));
     }
   };
 
   const handleNewPinClick = async () => {
     if (!newPin) return;
     mapRef.current?.easeTo({ center: [newPin.longitude, newPin.latitude], offset: [-240, 0] });
-    setDrawerState('create');
-    setIsDrawerOpen(true);
+    setDrawer({ isOpen: true, state: 'create' });
   };
 
   const handlePinClick = (e: MarkerEvent<mapboxgl.Marker, globalThis.MouseEvent>, pin: PinWithPhotos) => {
     e.originalEvent.stopPropagation(); // stop add pin firing on existing pins
-    setIsDrawerOpen(true);
-    setDrawerState('details');
+    setDrawer({ isOpen: true, state: 'details' });
     setPinDetails(pin);
     mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
   };
@@ -101,7 +101,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
         </Map>
       </div>
       <AnimatePresence>
-        {isDrawerOpen && (
+        {drawer.isOpen && (
           <motion.div
             key='create'
             className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
