@@ -1,7 +1,7 @@
 'use client';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl';
 import GeocoderControl from '@/components/GeocoderControl';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -10,7 +10,7 @@ import Image from 'next/image';
 import Drawer from './Drawer';
 import { pinDetailsAtom, isDrawerOpenAtom, drawerStateAtom, newPinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
-import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
+import type { MarkerEvent, ViewStateChangeEvent } from 'react-map-gl/dist/esm/types';
 import { env } from '@/env.mjs';
 // import { useQuery } from '@tanstack/react-query';
 
@@ -22,21 +22,11 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
     longitude: 17,
     zoom: 4,
   });
+  const [cursor, setCursor] = useState('default');
   const [newPin, setNewPin] = useAtom(newPinAtom);
   const [isDrawerOpen, setIsDrawerOpen] = useAtom(isDrawerOpenAtom);
   const [drawerState, setDrawerState] = useAtom(drawerStateAtom);
   const [, setPinDetails] = useAtom(pinDetailsAtom);
-
-  // const fetcher = async (): Promise<UserWithPins> => {
-  //   const response = await fetch('/api/get-user', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify(userId),
-  //   });
-  //   return await response.json();
-  // };
-
-  // const { data: user } = useQuery(['user'], () => fetcher());
 
   const mapRef = useRef<MapRef>(null);
 
@@ -66,18 +56,24 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
     mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
   };
 
+  const handleMapDragStart = useCallback(() => setCursor('all-scroll'), []);
+  const handleMapDragEnd = useCallback(() => setCursor('default'), []);
+
   return (
     <div className='overflow-hidden relative'>
       <div className='w-full h-screen'>
         <Map
           ref={mapRef}
           {...viewState}
-          onMove={(evt) => setViewState(evt.viewState)}
+          onMove={(e) => setViewState(e.viewState)}
+          onDragStart={handleMapDragStart}
+          onDragEnd={handleMapDragEnd}
           mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX}
           doubleClickZoom={false}
           mapStyle='mapbox://styles/liuhe2020/cktu2h4q70wil17m6umh33a9i'
           minZoom={1.585} // limit zoom out to single world map
           maxZoom={19}
+          cursor={cursor}
           onClick={handleMapClick}
         >
           <GeocoderControl mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX} position='top-left' />
@@ -88,7 +84,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
               offset={[0, -14]} //centering marker
               onClick={handleNewPinClick}
             >
-              <Image src='/images/marker_blue.svg' alt='marker_pin' width={32} height={48} />
+              <Image src='/images/marker_blue.svg' alt='marker_pin' width={32} height={48} className='cursor-pointer' />
             </Marker>
           )}
           {user?.pins.map((pin) => (
@@ -99,7 +95,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
               offset={[0, -14]} //centering marker
               onClick={(e) => handlePinClick(e, pin)}
             >
-              <Image src='/images/marker_orange.svg' alt='marker_pin' width={32} height={48} />
+              <Image src='/images/marker_orange.svg' alt='marker_pin' width={32} height={48} className='cursor-pointer' />
             </Marker>
           ))}
         </Map>
