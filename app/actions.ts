@@ -28,7 +28,7 @@ export async function createPinAction(pin: NewPinValues, files: string[]) {
       photos = await Promise.all(uploadPhotos);
     }
 
-    await prisma.pin.create({
+    const data = await prisma.pin.create({
       data: {
         location: pin.location,
         city: pin.city || null,
@@ -41,10 +41,12 @@ export async function createPinAction(pin: NewPinValues, files: string[]) {
         userId: session.user.id,
         ...(photos.length && { photos: { createMany: { data: photos.map((photo) => ({ id: photo.public_id, url: photo.secure_url })) } } }),
       },
+      include: { photos: true },
     });
+    return { data, error: null };
   } catch (err) {
     console.error(err);
-    return { error: err };
+    return { error: 'Failed to create pin.' };
   }
 }
 
@@ -66,7 +68,7 @@ export async function editPinAction(pin: PinValues, deletePhotos: string[], file
     }
 
     // update pin with conditions
-    await prisma.pin.update({
+    const data = await prisma.pin.update({
       where: { id: pin.id },
       data: {
         location: pin.location,
@@ -82,10 +84,12 @@ export async function editPinAction(pin: PinValues, deletePhotos: string[], file
           },
         }),
       },
+      include: { photos: true },
     });
+    return { data, error: null };
   } catch (err) {
     console.error(err);
-    return { error: err };
+    return { error: 'Failed to edit pin.' };
   }
 }
 
@@ -109,6 +113,6 @@ export async function deletePinAction(id: string) {
     }
   } catch (err) {
     console.error(err);
-    return { error: err };
+    return { error: 'Failed to delete pin.' };
   }
 }

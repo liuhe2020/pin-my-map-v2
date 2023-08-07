@@ -23,6 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { deletePinAction } from '@/app/actions';
+import Overlay from '@/components/ui/overlay';
 
 export default function PinDetails() {
   const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
@@ -49,83 +50,85 @@ export default function PinDetails() {
   };
 
   return (
-    <div className='space-y-4 text-sm font-medium'>
-      <div className='space-y-2'>
-        <h2>Location</h2>
-        <p className=''>{pinDetails?.location}</p>
-      </div>
-      <div className='space-y-2'>
-        <h2>City</h2>
-        <p className=''>{pinDetails?.city}</p>
-      </div>
-      <div className='space-y-2'>
-        <h2>Region</h2>
-        <p className=''>{pinDetails?.region}</p>
-      </div>
-      <div className='space-y-2'>
-        <h2>Country</h2>
-        <p className=''>{pinDetails?.country}</p>
-      </div>
-      <div className='space-y-2'>
-        <h2>Date</h2>
-        <p className=''>{pinDetails?.date?.toISOString().substring(0, 10)}</p>
-      </div>
-      <div className='space-y-2'>
-        <h2>Description</h2>
-        <p className=''>{pinDetails?.description}</p>
-      </div>
-      {pinDetails && pinDetails.photos.length > 0 && (
+    <>
+      <div className='space-y-4 text-sm font-medium'>
         <div className='space-y-2'>
-          <h2>Photos</h2>
-          <div className='grid grid-cols-3 gap-2'>
-            {pinDetails?.photos.map((photo, i) => (
-              <Image
-                key={photo.id}
-                src={photo.url}
-                alt={pinDetails.location}
-                width={140}
-                height={140}
-                className='aspect-square object-cover cursor-pointer'
-                onClick={() => handleImageClick(i)}
-              />
-            ))}
-          </div>
+          <h2>Location</h2>
+          <p className=''>{pinDetails?.location}</p>
         </div>
-      )}
-      <div className='flex gap-x-2'>
-        <Button
-          onClick={() => setDrawer((prev) => ({ ...prev, state: 'edit' }))}
-          type='submit'
-          className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}
-        >
-          Edit
-        </Button>
-        <AlertDialog>
-          <AlertDialogTrigger
-            disabled={isPending}
-            className={'flex justify-center items-center text-white bg-red-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24'}
+        <div className='space-y-2'>
+          <h2>City</h2>
+          <p className=''>{pinDetails?.city}</p>
+        </div>
+        <div className='space-y-2'>
+          <h2>Region</h2>
+          <p className=''>{pinDetails?.region}</p>
+        </div>
+        <div className='space-y-2'>
+          <h2>Country</h2>
+          <p className=''>{pinDetails?.country}</p>
+        </div>
+        <div className='space-y-2'>
+          <h2>Date</h2>
+          <p className=''>{pinDetails?.date?.toISOString().substring(0, 10)}</p>
+        </div>
+        <div className='space-y-2'>
+          <h2>Description</h2>
+          <p className=''>{pinDetails?.description}</p>
+        </div>
+        {pinDetails && pinDetails.photos.length > 0 && (
+          <div className='space-y-2'>
+            <h2>Photos</h2>
+            <div className='grid grid-cols-3 gap-2'>
+              {pinDetails?.photos.map((photo, i) => (
+                <Image
+                  key={photo.id}
+                  src={photo.url}
+                  alt={pinDetails.location}
+                  width={140}
+                  height={140}
+                  className='aspect-square object-cover cursor-pointer'
+                  onClick={() => handleImageClick(i)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        <div className='flex gap-x-2'>
+          <Button
+            onClick={() => setDrawer((prev) => ({ ...prev, state: 'edit' }))}
+            type='submit'
+            className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}
           >
-            Delete
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>This will permanently delete the pin from your map. This action cannot be undone.</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPending} className={'w-24 font-medium'}>
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteClick}
-                disabled={isPending}
-                className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'}
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+            Edit
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger
+              disabled={isPending}
+              className={'flex justify-center items-center text-white bg-red-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24'}
+            >
+              Delete
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>This will permanently delete the pin from your map. This action cannot be undone.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isPending} className={'w-24 font-medium'}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteClick}
+                  disabled={isPending}
+                  className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
       <Lightbox
         open={isLightBoxOpen}
@@ -135,6 +138,7 @@ export default function PinDetails() {
         plugins={pinDetails && pinDetails.photos.length > 1 ? [Zoom, Thumbnails] : [Zoom]}
         carousel={{ finite: true }}
       />
-    </div>
+      {isPending && <Overlay />}
+    </>
   );
 }

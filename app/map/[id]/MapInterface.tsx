@@ -6,15 +6,13 @@ import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl'
 import GeocoderControl from '@/components/GeocoderControl';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { PinWithPhotos, UserWithPins } from '@/components/types';
-import Image from 'next/image';
 import Drawer from './Drawer';
 import { pinDetailsAtom, drawerAtom, newPinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
-import type { MarkerEvent, ViewStateChangeEvent } from 'react-map-gl/dist/esm/types';
+import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
 import { env } from '@/env.mjs';
-// import { useQuery } from '@tanstack/react-query';
-
-const ease = [[0.4, 0, 0.6, 1]];
+import { cn } from '@/lib/utils';
+import PinIcon from '@/components/ui/pin-icon';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({
@@ -31,16 +29,11 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
 
   // create a new marker at clicked location
   const handleMapClick = async (e: MapLayerMouseEvent) => {
-    // if (pin) return setPin(null);
     if (drawer.isOpen === false) {
-      if (newPin) {
-        return setNewPin(null);
-      }
+      if (newPin) return setNewPin(null);
       return setNewPin({ latitude: e.lngLat.lat, longitude: e.lngLat.lng });
     }
-    if (drawer.state === 'details') {
-      setDrawer((prev) => ({ ...prev, isOpen: false }));
-    }
+    if (drawer.state === 'details') setDrawer((prev) => ({ ...prev, isOpen: false }));
   };
 
   const handleNewPinClick = async () => {
@@ -51,6 +44,9 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
 
   const handlePinClick = (e: MarkerEvent<mapboxgl.Marker, globalThis.MouseEvent>, pin: PinWithPhotos) => {
     e.originalEvent.stopPropagation(); // stop add pin firing on existing pins
+    if (newPin && drawer.isOpen === true) return;
+    if (drawer.isOpen && drawer.state === 'edit') return;
+    setNewPin(null);
     setDrawer({ isOpen: true, state: 'details' });
     setPinDetails(pin);
     mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
@@ -84,7 +80,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
               offset={[0, -14]} //centering marker
               onClick={handleNewPinClick}
             >
-              <Image src='/images/marker_blue.svg' alt='marker_pin' width={32} height={48} className='cursor-pointer' />
+              <PinIcon className='cursor-pointer' colour='#6366f1' />
             </Marker>
           )}
           {user?.pins.map((pin) => (
@@ -95,7 +91,10 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
               offset={[0, -14]} //centering marker
               onClick={(e) => handlePinClick(e, pin)}
             >
-              <Image src='/images/marker_orange.svg' alt='marker_pin' width={32} height={48} className='cursor-pointer' />
+              <PinIcon
+                className={cn(drawer.isOpen === true && (drawer.state === 'create' || drawer.state === 'edit') ? 'cursor-default' : 'cursor-pointer')}
+                colour='#f97316'
+              />
             </Marker>
           ))}
         </Map>
@@ -103,12 +102,11 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
       <AnimatePresence>
         {drawer.isOpen && (
           <motion.div
-            key='create'
             className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ duration: 0.4, ease }}
+            transition={{ duration: 0.4, ease: [0.4, 0, 0.6, 1] }}
           >
             <Drawer />
           </motion.div>
