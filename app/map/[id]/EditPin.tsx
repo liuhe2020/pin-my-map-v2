@@ -159,7 +159,7 @@ export default function EditPin() {
                     <FormControl>
                       <Button variant={'outline'} className={cn('justify-start text-left font-normal', !field.value && 'text-muted-foreground')}>
                         <CalendarIcon className='mr-2 h-4 w-4' />
-                        {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                        {field.value ? format(field.value, 'd MMMM yyyy') : <span>Pick a date</span>}
                       </Button>
                     </FormControl>
                   </PopoverTrigger>

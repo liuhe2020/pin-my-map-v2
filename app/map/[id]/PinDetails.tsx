@@ -53,34 +53,43 @@ export default function PinDetails() {
 
   return (
     <>
-      <div className='space-y-4 text-sm font-medium'>
+      <div className='space-y-6 text-sm font-medium'>
         <div className='space-y-2'>
           <h2>Location</h2>
           <p className=''>{pinDetails?.location}</p>
         </div>
-        <div className='space-y-2'>
-          <h2>City</h2>
-          <p className=''>{pinDetails?.city}</p>
-        </div>
-        <div className='space-y-2'>
-          <h2>Region</h2>
-          <p className=''>{pinDetails?.region}</p>
-        </div>
-        <div className='space-y-2'>
-          <h2>Country</h2>
-          <p className=''>{pinDetails?.country}</p>
-        </div>
-        <div className='space-y-2'>
-          <h2>Date</h2>
-          <p className=''>{pinDetails?.date?.toISOString().substring(0, 10)}</p>
-        </div>
-        <div className='space-y-2'>
-          <h2>Description</h2>
-          <p className=''>{pinDetails?.description}</p>
-        </div>
+        {pinDetails?.city && (
+          <div className='space-y-2'>
+            <h2>City</h2>
+            <p className=''>{pinDetails?.city}</p>
+          </div>
+        )}
+        {pinDetails?.region && (
+          <div className='space-y-2'>
+            <h2>Region</h2>
+            <p className=''>{pinDetails?.region}</p>
+          </div>
+        )}
+        {pinDetails?.country && (
+          <div className='space-y-2'>
+            <h2>Country</h2>
+            <p className=''>{pinDetails?.country}</p>
+          </div>
+        )}
+        {pinDetails?.date && (
+          <div className='space-y-2'>
+            <h2>Date</h2>
+            <p className=''>{pinDetails.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
+        )}
+        {pinDetails?.description && (
+          <div className='space-y-2'>
+            <h2>Description</h2>
+            <p className=''>{pinDetails?.description}</p>
+          </div>
+        )}
         {pinDetails && pinDetails.photos.length > 0 && (
           <div className='space-y-2'>
-            <h2>Photos</h2>
             <div className='grid grid-cols-3 gap-2'>
               {pinDetails?.photos.map((photo, i) => (
                 <Image
