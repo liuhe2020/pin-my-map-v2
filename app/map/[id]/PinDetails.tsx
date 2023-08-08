@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { deletePinAction } from '@/app/actions';
 import Overlay from '@/components/ui/overlay';
+import { AnimatePresence } from 'framer-motion';
 
 export default function PinDetails() {
   const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
@@ -44,6 +45,7 @@ export default function PinDetails() {
       startTransition(async () => {
         const response = await deletePinAction(pinDetails.id);
         if (response?.error) return alert('ERROR');
+        setDrawer((prev) => ({ ...prev, isOpen: false }));
         router.refresh();
       });
     }
@@ -138,7 +140,7 @@ export default function PinDetails() {
         plugins={pinDetails && pinDetails.photos.length > 1 ? [Zoom, Thumbnails] : [Zoom]}
         carousel={{ finite: true }}
       />
-      {isPending && <Overlay />}
+      <AnimatePresence>{isPending && <Overlay />}</AnimatePresence>
     </>
   );
 }
