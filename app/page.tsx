@@ -11,8 +11,8 @@ export default function HomePage() {
   const { data: session, status } = useSession();
 
   return (
-    <main className=''>
-      <div className="relative before:bg-[url('/images/background.jpg')] before:opacity-60 before:-z-10 before:w-full before:h-screen before:fixed before:inset-0 before:object-cover before:object-left before:bg-no-repeat grid place-items-center h-screen">
+    <main>
+      <div className="relative bg-[url('/images/background.webp')] before:w-full before:h-full before:bg-white/50 before:absolute before:inset-0 w-full h-[100svh] inset-0 bg-cover bg-center grid place-items-center">
         <div className='flex flex-col gap-y-6 max-w-md m-6 p-6 sm:p-12 rounded-2xl text-center backdrop-blur-lg shadow-xl bg-white/50'>
           <Image src='/images/pin_logo.png' width={32} height={32} alt='pin my map logo' className='mx-auto pb-2' />
           <h1 className='text-4xl font-bold text-orange-500 sm:text-5xl'>Pin My Map</h1>
