@@ -173,6 +173,10 @@ export default function EditPin() {
                       captionLayout='dropdown-buttons'
                       fromDate={new Date(new Date().getFullYear() - 100, new Date().getMonth(), new Date().getDate())}
                       toDate={new Date()}
+                      classNames={{
+                        day_selected:
+                          'bg-indigo-500 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-indigo-500 focus:text-primary-foreground',
+                      }}
                     />
                   </PopoverContent>
                 </Popover>

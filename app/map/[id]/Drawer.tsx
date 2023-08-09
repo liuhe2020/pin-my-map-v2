@@ -2,7 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { drawerAtom } from '@/lib/atoms';
-import { GrClose } from 'react-icons/gr';
+import { VscChromeClose } from 'react-icons/vsc';
 import PinDetails from './PinDetails';
 import EditPin from './EditPin';
 import CreatePin from './CreatePin';
@@ -38,7 +38,7 @@ export default function Drawer() {
       <div className='p-4 sm:p-6 flex flex-col gap-y-6'>
         <div className='flex justify-between'>
           <h2 className='grow text-xl font-medium'>{titles[drawer.state]}</h2>
-          <GrClose className='w-6 h-6 cursor-pointer' onClick={handleDrawerClose} />
+          <VscChromeClose className='w-6 h-6 cursor-pointer' onClick={handleDrawerClose} />
         </div>
         {drawer.state === 'details' && <PinDetails />}
         {drawer.state === 'create' && <CreatePin />}
