@@ -13,6 +13,7 @@ import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
 import { env } from '@/env.mjs';
 import { cn } from '@/lib/utils';
 import PinIcon from '@/components/ui/pin-icon';
+import Menu from '@/components/Menu';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({
@@ -99,6 +100,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
           ))}
         </Map>
       </div>
+      <Menu user={user} />
       <AnimatePresence>
         {drawer.isOpen && (
           <motion.div

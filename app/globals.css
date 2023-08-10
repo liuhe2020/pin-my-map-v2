@@ -323,3 +323,62 @@
 .rdp-vhidden {
   @apply hidden;
 }
+
+/* mapbox geocoder */
+.mapboxgl-ctrl-top-left {
+  width: 100%;
+}
+
+.mapboxgl-ctrl-top-left .mapboxgl-ctrl {
+  margin: 12px 0 0 12px !important;
+}
+
+.mapboxgl-ctrl-geocoder {
+  width: calc(100% - 80px);
+  max-width: 280px;
+  min-width: 180px;
+  font-size: 1rem;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+  height: 44px;
+  padding: 6px 15px 6px 45px;
+}
+
+.mapboxgl-ctrl-geocoder--icon-search {
+  top: 11px;
+  left: 12px;
+  width: 23px;
+  height: 23px;
+}
+
+.mapboxgl-ctrl-geocoder--icon-close {
+  width: 18px;
+  height: 18px;
+  margin-top: 6px;
+  margin-right: 3px;
+}
+
+@media screen and (min-width: 400px) {
+}
+
+@media screen and (min-width: 640px) {
+  .mapboxgl-ctrl-geocoder--input {
+    height: 44px;
+    padding: 6px 15px 6px 45px;
+  }
+
+  .mapboxgl-ctrl-geocoder--icon-search {
+    top: 11px;
+    left: 12px;
+    width: 23px;
+    height: 23px;
+  }
+
+  .mapboxgl-ctrl-geocoder--icon-close {
+    width: 18px;
+    height: 18px;
+    margin-top: 6px;
+    margin-right: 3px;
+  }
+}
