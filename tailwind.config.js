@@ -6,10 +6,6 @@ module.exports = {
     container: {
       center: true,
       padding: '2rem',
-      screens: {
-        sm: '480px',
-        '2xl': '1400px',
-      },
     },
     extend: {
       width: {
@@ -72,6 +68,11 @@ module.exports = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+    },
+    screens: {
+      xs: '360px',
+      sm: '480px',
+      '2xl': '1400px',
     },
   },
   plugins: [require('tailwindcss-animate')],
