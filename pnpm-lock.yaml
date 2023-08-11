@@ -71,6 +71,9 @@ dependencies:
   next-auth:
     specifier: ^4.22.4
     version: 4.22.4(next@13.4.13)(nodemailer@6.9.4)(react-dom@18.2.0)(react@18.2.0)
+  next-share:
+    specifier: ^0.24.0
+    version: 0.24.0(react@18.2.0)
   nodemailer:
     specifier: ^6.9.4
     version: 6.9.4
@@ -98,9 +101,6 @@ dependencies:
   react-map-gl:
     specifier: ^7.1.3
     version: 7.1.3(mapbox-gl@2.15.0)(react-dom@18.2.0)(react@18.2.0)
-  react-share:
-    specifier: ^4.4.1
-    version: 4.4.1(react@18.2.0)
   tailwind-merge:
     specifier: ^1.14.0
     version: 1.14.0
@@ -1995,10 +1995,6 @@ packages:
       clsx: 1.2.1
     dev: false
 
-  /classnames@2.3.2:
-    resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
-    dev: false
-
   /client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
     dev: false
@@ -3722,6 +3718,18 @@ packages:
       uuid: 8.3.2
     dev: false
 
+  /next-share@0.24.0(react@18.2.0):
+    resolution: {integrity: sha512-6cA2lwcUnzk6kAqfeXXcqGKkV9EHWL4dpIP6QuO7dXmWWxLdvMqFbgvBJfG6vFGiMY/QPQ7jS7P+nLdSZhTfRA==}
+    engines: {node: '>=8', npm: '>=5'}
+    peerDependencies:
+      react: '>=17.0.2'
+    dependencies:
+      jsonp: 0.2.1
+      react: 18.2.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /next@13.4.13(@babel/core@7.22.10)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-A3YVbVDNeXLhWsZ8Nf6IkxmNlmTNz0yVg186NJ97tGZqPDdPzTrHotJ+A1cuJm2XfuWPrKOUZILl5iBQkIf8Jw==}
     engines: {node: '>=16.8.0'}
@@ -4320,19 +4328,6 @@ packages:
       tslib: 2.6.1
       use-callback-ref: 1.3.0(@types/react@18.2.18)(react@18.2.0)
       use-sidecar: 1.1.2(@types/react@18.2.18)(react@18.2.0)
-    dev: false
-
-  /react-share@4.4.1(react@18.2.0):
-    resolution: {integrity: sha512-AJ9m9RiJssqvYg7MoJUc9J0D7b/liWrsfQ99ndKc5vJ4oVHHd4Fy87jBlKEQPibT40oYA3AQ/a9/oQY6/yaigw==}
-    engines: {node: '>=6.9.0', npm: '>=5.0.0'}
-    peerDependencies:
-      react: ^16.3.0 || ^17 || ^18
-    dependencies:
-      classnames: 2.3.2
-      jsonp: 0.2.1
-      react: 18.2.0
-    transitivePeerDependencies:
-      - supports-color
     dev: false
 
   /react-style-singleton@2.2.1(@types/react@18.2.18)(react@18.2.0):
