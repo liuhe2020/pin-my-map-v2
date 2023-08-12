@@ -1,66 +1,104 @@
 'use client';
 
+import 'yet-another-react-lightbox/styles.css';
+import 'yet-another-react-lightbox/plugins/thumbnails.css';
 import { useAtom } from 'jotai';
-import { drawerAtom } from '@/lib/atoms';
+import { pinDetailsAtom } from '@/lib/atoms';
 import { VscChromeClose } from 'react-icons/vsc';
-import PinDetails from './PinDetails';
-import EditPin from './EditPin';
-import CreatePin from './CreatePin';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import type { PinWithPhotos } from '@/components/types';
+import { Lightbox } from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
 
 export default function Drawer() {
-  const [drawer, setDrawer] = useAtom(drawerAtom);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
+  const [pin, setPin] = useState<PinWithPhotos | null>(null);
+  const [isLightBoxOpen, setIsLightBoxOpen] = useState(false);
+  const [slideIndex, setSlideIndex] = useState(0);
 
-  const titles: { [key: string]: string } = {
-    details: 'Pin Details',
-    create: 'Create New Pin',
-    edit: 'Edit Pin',
+  const handleImageClick = (i: number) => {
+    setIsLightBoxOpen(true);
+    setSlideIndex(i);
   };
 
+  useEffect(() => {
+    pinDetails && setPin(pinDetails);
+  }, []);
+
   const handleDrawerClose = () => {
-    if (drawer.state === 'details') return setDrawer((prev) => ({ ...prev, isOpen: false }));
-    setIsDialogOpen(true);
+    setPinDetails(null);
   };
 
   return (
     <>
       <div className='p-4 sm:p-6 flex flex-col gap-y-6'>
-        <div className='flex justify-between'>
-          <h2 className='grow text-xl font-medium'>{titles[drawer.state]}</h2>
+        <div className='flex justify-end'>
           <VscChromeClose className='w-6 h-6 cursor-pointer' onClick={handleDrawerClose} />
         </div>
-        {drawer.state === 'details' && <PinDetails />}
-        {drawer.state === 'create' && <CreatePin />}
-        {drawer.state === 'edit' && <EditPin />}
+        <div className='space-y-6 text-sm font-medium'>
+          <div className='space-y-2'>
+            <h2>Location</h2>
+            <p className=''>{pin?.location}</p>
+          </div>
+          {pin?.city && (
+            <div className='space-y-2'>
+              <h2>City</h2>
+              <p className=''>{pin?.city}</p>
+            </div>
+          )}
+          {pin?.region && (
+            <div className='space-y-2'>
+              <h2>Region</h2>
+              <p className=''>{pin?.region}</p>
+            </div>
+          )}
+          {pin?.country && (
+            <div className='space-y-2'>
+              <h2>Country</h2>
+              <p className=''>{pin?.country}</p>
+            </div>
+          )}
+          {pin?.date && (
+            <div className='space-y-2'>
+              <h2>Date</h2>
+              <p className=''>{pin.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            </div>
+          )}
+          {pin?.description && (
+            <div className='space-y-2'>
+              <h2>Description</h2>
+              <p className=''>{pin?.description}</p>
+            </div>
+          )}
+          {pin && pin.photos.length > 0 && (
+            <div className='space-y-2'>
+              <div className='grid grid-cols-3 gap-2'>
+                {pin?.photos.map((photo, i) => (
+                  <Image
+                    key={photo.id}
+                    src={photo.url}
+                    alt={pin.location}
+                    width={140}
+                    height={140}
+                    className='aspect-square object-cover cursor-pointer'
+                    onClick={() => handleImageClick(i)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>Any unsaved data on the form will be lost.</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className={'w-24 font-medium'}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => setDrawer((prev) => ({ ...prev, isOpen: false }))}
-              className={'text-white bg-indigo-500 hover:brightness-110 hover:bg-indigo-500 font-medium w-24 p-2.5'}
-            >
-              Confirm
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Lightbox
+        open={isLightBoxOpen}
+        close={() => setIsLightBoxOpen(false)}
+        slides={pin?.photos.map((photo) => ({ src: photo.url, alt: pin.location }))}
+        index={slideIndex}
+        plugins={pin && pin.photos.length > 1 ? [Zoom, Thumbnails] : [Zoom]}
+        carousel={{ finite: true }}
+      />
     </>
   );
 }

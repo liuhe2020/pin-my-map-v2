@@ -49,7 +49,7 @@ export default function HomePage() {
             )}
             {session && (
               <Link
-                href={`/map/${session.user?.id}`}
+                href={`/user/${session.user?.id}`}
                 className='flex justify-center items-center gap-x-2 text-white bg-orange-500 hover:brightness-110 font-semibold rounded-lg p-3.5 focus:outline-none w-full mx-auto lg:mx-0 text-center shadow-neutral-300 shadow-md'
               >
                 <FaLocationArrow className='w-4 h-4' />
