@@ -11,7 +11,7 @@ import { useAtom } from 'jotai';
 import { env } from '@/env.mjs';
 import { cn } from '@/lib/utils';
 import PinIcon from '@/components/ui/pin-icon';
-import Menu from '@/components/Menu';
+import Menu from './Menu';
 import Drawer from './Drawer';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
@@ -74,7 +74,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
           ))}
         </Map>
       </div>
-      <Menu user={user} />
+      <Menu />
       <AnimatePresence>
         {pinDetails && (
           <motion.div

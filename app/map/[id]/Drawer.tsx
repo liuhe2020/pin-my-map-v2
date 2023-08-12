@@ -23,9 +23,10 @@ export default function Drawer() {
     setSlideIndex(i);
   };
 
+  // store global state in local state, details persist on ui when closing animated sliding drawer
   useEffect(() => {
     pinDetails && setPin(pinDetails);
-  }, []);
+  }, [pinDetails]);
 
   const handleDrawerClose = () => {
     setPinDetails(null);

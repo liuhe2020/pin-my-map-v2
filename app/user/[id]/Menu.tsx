@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import type { UserWithPins } from './types';
+import type { UserWithPins } from '../../../components/types';
 import Image from 'next/image';
 import { CgMenuGridO } from 'react-icons/cg';
 import { FaCircleUser } from 'react-icons/fa6';

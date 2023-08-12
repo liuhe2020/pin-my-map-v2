@@ -13,7 +13,7 @@ import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
 import { env } from '@/env.mjs';
 import { cn } from '@/lib/utils';
 import PinIcon from '@/components/ui/pin-icon';
-import Menu from '@/components/Menu';
+import Menu from '@/app/user/[id]/Menu';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({

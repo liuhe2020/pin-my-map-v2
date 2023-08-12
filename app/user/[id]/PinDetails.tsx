@@ -116,7 +116,7 @@ export default function PinDetails() {
           <AlertDialog>
             <AlertDialogTrigger
               disabled={isPending}
-              className={'flex justify-center items-center text-white bg-red-500 hover:brightness-110 font-medium rounded-lg p-2.5 focus:outline-none w-24'}
+              className={'flex justify-center items-center text-white bg-red-500 hover:brightness-110 font-medium rounded-md p-2.5 focus:outline-none w-24'}
             >
               Delete
             </AlertDialogTrigger>
