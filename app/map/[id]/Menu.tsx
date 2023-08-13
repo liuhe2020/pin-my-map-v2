@@ -19,17 +19,21 @@ import {
 } from 'next-share';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useAtom } from 'jotai';
+import { menuAtom } from '@/lib/atoms';
 
 export default function Menu() {
+  const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
+
   const pathname = usePathname();
   const url = `https://pinmymap.vercel.app${pathname}`;
 
   return (
-    <Popover>
+    <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <PopoverTrigger className={'absolute top-[22px] left-5 z-10'}>
         <CgMenuGridO className='w-6 h-6 text-gray-500' />
       </PopoverTrigger>
-      <PopoverContent className={'ml-3 mt-3 text-sm font-medium space-y-4 w-[calc(100vw-24px)] sm:w-[280px]'}>
+      <PopoverContent onInteractOutside={(e) => e.preventDefault()} className={'ml-3 mt-3 text-sm font-medium space-y-4 w-[calc(100vw-24px)] sm:w-[280px]'}>
         <Link
           href='/'
           className='text-white bg-orange-500 hover:brightness-110 hover:bg-orange-500 rounded-md font-medium pl-2.5 pr-3.5 py-2 inline-flex items-center gap-1'

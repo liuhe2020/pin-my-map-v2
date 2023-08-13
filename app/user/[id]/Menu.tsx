@@ -20,16 +20,20 @@ import {
   TwitterIcon,
   WhatsappIcon,
 } from 'next-share';
+import { useAtom } from 'jotai';
+import { menuAtom } from '@/lib/atoms';
 
 export default function Menu({ user }: { user: UserWithPins }) {
+  const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
+
   const url = `https://pinmymap.vercel.app/map/${user.id}`;
 
   return (
-    <Popover>
+    <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <PopoverTrigger className={'absolute top-[22px] left-5 z-10'}>
         <CgMenuGridO className='w-6 h-6 text-gray-500' />
       </PopoverTrigger>
-      <PopoverContent className={'ml-3 mt-3 text-sm font-medium space-y-6 w-[calc(100vw-24px)] sm:w-[280px]'}>
+      <PopoverContent onInteractOutside={(e) => e.preventDefault()} className={'ml-3 mt-3 text-sm font-medium space-y-6 w-[calc(100vw-24px)] sm:w-[280px]'}>
         <div className='flex items-center gap-x-2'>
           {user.image ? (
             <Image className='rounded-full shadow-lg' src={user.image} alt={user.name ?? 'user icon'} width={32} height={32} />

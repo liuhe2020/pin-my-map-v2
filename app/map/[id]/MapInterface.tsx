@@ -6,7 +6,7 @@ import Map, { Marker, type MapRef } from 'react-map-gl';
 import GeocoderControl from '@/components/GeocoderControl';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { PinWithPhotos, UserWithPins } from '@/components/types';
-import { pinDetailsAtom } from '@/lib/atoms';
+import { menuAtom, pinDetailsAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import { env } from '@/env.mjs';
 import PinIcon from '@/components/ui/pin-icon';
@@ -22,16 +22,25 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
   });
   const [cursor, setCursor] = useState('default');
   const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
+  const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
 
   const mapRef = useRef<MapRef>(null);
 
   // create a new marker at clicked location
   const handleMapClick = async () => {
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+      return;
+    }
     if (pinDetails) setPinDetails(null);
   };
 
   const handlePinClick = (e: MarkerEvent<mapboxgl.Marker, globalThis.MouseEvent>, pin: PinWithPhotos) => {
     e.originalEvent.stopPropagation(); // stop handleMapClick firing
+    if (isMenuOpen) {
+      setIsMenuOpen(false); // stop drawer open if menu is open
+      return;
+    }
     setPinDetails(pin);
     mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
   };

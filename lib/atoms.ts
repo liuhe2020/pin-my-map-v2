@@ -7,4 +7,6 @@ const newPinAtom = atom<Pick<PinValues, 'latitude' | 'longitude'> | null>(null);
 
 const drawerAtom = atom({ isOpen: false, state: '' }); // state values: details | create | edit;
 
-export { pinDetailsAtom, newPinAtom, drawerAtom };
+const menuAtom = atom<boolean>(false);
+
+export { pinDetailsAtom, newPinAtom, drawerAtom, menuAtom };
