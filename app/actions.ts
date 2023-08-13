@@ -9,12 +9,12 @@ cloudinary.config({
 
 import { type UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 import prisma from '@/lib/prisma';
-import type { NewPinValues, PinValues } from '@/components/types';
+import type { PinValues } from '@/components/types';
 import { env } from '@/env.mjs';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 
-export async function createPinAction(pin: NewPinValues, files: string[]) {
+export async function createPinAction(pin: PinValues, files: string[]) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) return { error: 'The user is not signed in.' };
@@ -50,7 +50,7 @@ export async function createPinAction(pin: NewPinValues, files: string[]) {
   }
 }
 
-export async function editPinAction(pin: PinValues, deletePhotos: string[], files: string[]) {
+export async function editPinAction(pin: Partial<PinValues>, deletePhotos: string[], files: string[]) {
   try {
     let deleted: string[] = [];
     let uploaded: UploadApiResponse[] = [];

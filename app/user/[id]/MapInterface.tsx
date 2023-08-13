@@ -28,13 +28,18 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
 
   const mapRef = useRef<MapRef>(null);
 
-  // create a new marker at clicked location
   const handleMapClick = async (e: MapLayerMouseEvent) => {
-    if (drawer.isOpen === false) {
-      if (newPin) return setNewPin(null);
-      return setNewPin({ latitude: e.lngLat.lat, longitude: e.lngLat.lng });
+    if (!drawer.isOpen) {
+      if (newPin) {
+        setNewPin(null);
+        return;
+      }
+      setNewPin({ latitude: e.lngLat.lat, longitude: e.lngLat.lng });
+      return;
     }
-    if (drawer.state === 'details') setDrawer((prev) => ({ ...prev, isOpen: false }));
+    if (drawer.state === 'details') {
+      setDrawer((prev) => ({ ...prev, isOpen: false }));
+    }
   };
 
   const handleNewPinClick = async () => {

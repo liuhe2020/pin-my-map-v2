@@ -6,13 +6,13 @@ import Map, { Marker, type MapRef } from 'react-map-gl';
 import GeocoderControl from '@/components/GeocoderControl';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { PinWithPhotos, UserWithPins } from '@/components/types';
-import { pinDetailsAtom, drawerAtom } from '@/lib/atoms';
+import { pinDetailsAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import { env } from '@/env.mjs';
-import { cn } from '@/lib/utils';
 import PinIcon from '@/components/ui/pin-icon';
 import Menu from './Menu';
 import Drawer from './Drawer';
+import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({
@@ -21,18 +21,17 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
     zoom: 4,
   });
   const [cursor, setCursor] = useState('default');
-  const [drawer, setDrawer] = useAtom(drawerAtom);
   const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
 
   const mapRef = useRef<MapRef>(null);
 
   // create a new marker at clicked location
   const handleMapClick = async () => {
-    if (pinDetails) setDrawer({ isOpen: false, state: 'details' });
+    if (pinDetails) setPinDetails(null);
   };
 
-  const handlePinClick = (pin: PinWithPhotos) => {
-    setDrawer({ isOpen: true, state: 'details' });
+  const handlePinClick = (e: MarkerEvent<mapboxgl.Marker, globalThis.MouseEvent>, pin: PinWithPhotos) => {
+    e.originalEvent.stopPropagation(); // stop handleMapClick firing
     setPinDetails(pin);
     mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
   };
@@ -64,12 +63,9 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
               latitude={pin.latitude}
               longitude={pin.longitude}
               offset={[0, -14]} //centering marker
-              onClick={() => handlePinClick(pin)}
+              onClick={(e) => handlePinClick(e, pin)}
             >
-              <PinIcon
-                className={cn(drawer.isOpen === true && (drawer.state === 'create' || drawer.state === 'edit') ? 'cursor-default' : 'cursor-pointer')}
-                colour='#f97316'
-              />
+              <PinIcon className={'cursor-pointer'} colour='#f97316' />
             </Marker>
           ))}
         </Map>

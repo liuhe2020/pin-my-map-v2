@@ -1,8 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { UserWithPins } from '../../../components/types';
 import Image from 'next/image';
@@ -22,11 +20,9 @@ import {
   TwitterIcon,
   WhatsappIcon,
 } from 'next-share';
-import { usePathname } from 'next/navigation';
 
 export default function Menu({ user }: { user: UserWithPins }) {
-  const pathname = usePathname();
-  const url = `https://pinmymap.vercel.app${pathname}`;
+  const url = `https://pinmymap.vercel.app/map/${user.id}`;
 
   return (
     <Popover>
