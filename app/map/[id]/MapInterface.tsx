@@ -13,7 +13,7 @@ import PinIcon from '@/components/ui/pin-icon';
 import Menu from './Menu';
 import Drawer from './Drawer';
 import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
-import { useMediaQuery } from '@/lib/useMediaQuery';
+import { useWindowSize } from '@/lib/useWindowSize';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({
@@ -24,7 +24,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
   const [cursor, setCursor] = useState('default');
   const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
   const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
-  const isViewPort = useMediaQuery('only screen and (min-width : 640px)');
+  const { width: windowWidth } = useWindowSize();
 
   const mapRef = useRef<MapRef>(null);
 
@@ -44,7 +44,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
       return;
     }
     setPinDetails(pin);
-    isViewPort && mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
+    windowWidth && windowWidth >= 640 && mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
   };
 
   const handleMapDragStart = useCallback(() => setCursor('all-scroll'), []);
