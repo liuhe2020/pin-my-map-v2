@@ -13,6 +13,7 @@ import PinIcon from '@/components/ui/pin-icon';
 import Menu from './Menu';
 import Drawer from './Drawer';
 import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
+import { useMediaQuery } from '@/lib/useMediaQuery';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({
@@ -23,6 +24,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
   const [cursor, setCursor] = useState('default');
   const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
   const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
+  const isViewPort = useMediaQuery('only screen and (min-width : 640px)');
 
   const mapRef = useRef<MapRef>(null);
 
@@ -42,7 +44,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
       return;
     }
     setPinDetails(pin);
-    mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
+    isViewPort && mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
   };
 
   const handleMapDragStart = useCallback(() => setCursor('all-scroll'), []);
@@ -83,7 +85,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
       <AnimatePresence>
         {pinDetails && (
           <motion.div
-            className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
+            className='absolute right-0 top-0 h-full z-10 backdrop-blur-lg shadow-xl bg-white/70 w-full max-w-120 overflow-y-auto'
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}

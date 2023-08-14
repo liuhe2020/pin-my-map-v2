@@ -14,6 +14,7 @@ import { env } from '@/env.mjs';
 import { cn } from '@/lib/utils';
 import PinIcon from '@/components/ui/pin-icon';
 import Menu from '@/app/user/[id]/Menu';
+import { useMediaQuery } from '@/lib/useMediaQuery';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({
@@ -26,6 +27,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
   const [drawer, setDrawer] = useAtom(drawerAtom);
   const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
   const [, setPinDetails] = useAtom(pinDetailsAtom);
+  const isViewPort = useMediaQuery('only screen and (min-width : 640px)');
 
   const mapRef = useRef<MapRef>(null);
 
@@ -49,7 +51,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
 
   const handleNewPinClick = async () => {
     if (!newPin) return;
-    mapRef.current?.easeTo({ center: [newPin.longitude, newPin.latitude], offset: [-240, 0] });
+    isViewPort && mapRef.current?.easeTo({ center: [newPin.longitude, newPin.latitude], offset: [-240, 0] });
     setDrawer({ isOpen: true, state: 'create' });
   };
 
@@ -64,7 +66,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
     setNewPin(null);
     setDrawer({ isOpen: true, state: 'details' });
     setPinDetails(pin);
-    mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
+    isViewPort && mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
   };
 
   const handleMapDragStart = useCallback(() => setCursor('all-scroll'), []);
@@ -118,7 +120,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
       <AnimatePresence>
         {drawer.isOpen && (
           <motion.div
-            className='absolute right-0 top-0 h-full z-10 bg-white w-full max-w-120 overflow-y-auto'
+            className='absolute right-0 top-0 h-full z-10 backdrop-blur-lg shadow-xl bg-white/70 w-full max-w-120 overflow-y-auto'
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
