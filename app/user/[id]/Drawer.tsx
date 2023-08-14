@@ -45,16 +45,16 @@ export default function Drawer() {
         {drawer.state === 'edit' && <EditPin />}
       </div>
       <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className='w-4/5 rounded-lg'>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>Any unsaved data on the form will be lost.</AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className={'w-24 font-medium'}>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className='items-center'>
+            <AlertDialogCancel className='w-full max-w-[12rem] sm:w-24 font-medium'>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => setDrawer((prev) => ({ ...prev, isOpen: false }))}
-              className={'text-white bg-indigo-500 hover:brightness-110 hover:bg-indigo-500 font-medium w-24 p-2.5'}
+              className='text-white bg-indigo-500 hover:brightness-110 hover:bg-indigo-500 font-medium w-full max-w-[12rem] p-2.5 sm:w-24'
             >
               Confirm
             </AlertDialogAction>

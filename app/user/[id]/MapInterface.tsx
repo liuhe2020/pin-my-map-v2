@@ -120,7 +120,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
       <AnimatePresence>
         {drawer.isOpen && (
           <motion.div
-            className='absolute right-0 top-0 h-full z-10 backdrop-blur-lg shadow-xl bg-white/70 w-full max-w-120 overflow-y-auto'
+            className='absolute right-0 top-0 h-full z-10 backdrop-blur-lg shadow-xl bg-white/80 w-full max-w-120 overflow-y-auto'
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}

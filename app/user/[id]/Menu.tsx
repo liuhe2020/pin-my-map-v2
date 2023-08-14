@@ -22,6 +22,7 @@ import {
 } from 'next-share';
 import { useAtom } from 'jotai';
 import { menuAtom } from '@/lib/atoms';
+import { signOut } from 'next-auth/react';
 
 export default function Menu({ user }: { user: UserWithPins }) {
   const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
@@ -41,7 +42,12 @@ export default function Menu({ user }: { user: UserWithPins }) {
             <FaCircleUser className='w-8 h-8' />
           )}
           {user.name && <span>{user.name}</span>}
-          <Button className={'text-white bg-orange-500 hover:brightness-110 hover:bg-orange-500 font-medium w-20 p-2.5 h-9 ml-auto'}>Sign out</Button>
+          <Button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className={'text-white bg-orange-500 hover:brightness-110 hover:bg-orange-500 font-medium w-20 p-2.5 h-9 ml-auto'}
+          >
+            Sign out
+          </Button>
         </div>
         <div className='space-y-2'>
           <p>Share your map</p>

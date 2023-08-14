@@ -212,7 +212,7 @@ export default function CreatePin() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea className='resize-none' {...field} rows={10} />
+                  <Textarea className={'resize-none bg-white'} {...field} rows={10} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -220,21 +220,21 @@ export default function CreatePin() {
           />
           <div>
             <p className='text-sm font-medium'>Photos</p>
-            <div {...getRootProps()} className='border border-input rounded-md mt-2 cursor-pointer group'>
+            <div {...getRootProps()} className='border border-input rounded-md mt-2 cursor-pointer group bg-white'>
               <div
                 className={cn(
-                  isDragActive ? 'border-indigo-500' : 'border-white',
+                  isDragActive ? 'border-indigo-500' : 'border-transparent',
                   'min-h-[160px] flex items-center justify-center m-1 border-2 border-dashed rounded-md group-hover:border-indigo-500 transition-all duration-200'
                 )}
               >
                 {/* <input {...getInputProps()} /> */}
                 <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'transition-all duration-400')}>
                   {files.length > 0 && (
-                    <div className='grid grid-cols-3 p-6 gap-6'>
+                    <div className='grid grid-cols-2 sm:grid-cols-3 p-6 gap-6'>
                       {files.map((file, index) => (
                         <div key={index} className='relative'>
                           <div className='relative'>
-                            <Image src={file} alt='preview' width={120} height={120} className='aspect-square object-cover rounded-md' />
+                            <Image src={file} alt='preview' width={120} height={120} className='w-full aspect-square object-cover rounded-md' />
                           </div>
                           <AiFillMinusCircle
                             className='absolute -top-3 -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
@@ -245,8 +245,8 @@ export default function CreatePin() {
                     </div>
                   )}
                   {files.length === 0 && (
-                    <div className='flex flex-col items-center gap-y-2 my-auto'>
-                      <p className='text-sm font-medium'>Click to select photos, or drag and drop here</p>
+                    <div className='flex flex-col items-center gap-y-2 my-auto px-4'>
+                      <p className='text-sm text-center font-medium'>Click to select photos, or drag and drop here</p>
                       <BiSolidCloudUpload className='w-6 h-6 text-indigo-500' />
                     </div>
                   )}
