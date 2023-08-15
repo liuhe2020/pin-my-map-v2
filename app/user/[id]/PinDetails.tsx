@@ -120,19 +120,19 @@ export default function PinDetails() {
             >
               Delete
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className='w-4/5 rounded-lg'>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>This will permanently delete the pin from your map. This action cannot be undone.</AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={isPending} className={'w-24 font-medium'}>
+              <AlertDialogFooter className='items-center'>
+                <AlertDialogCancel disabled={isPending} className='w-full max-w-[12rem] sm:w-24 font-medium'>
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDeleteClick}
                   disabled={isPending}
-                  className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-24 p-2.5'}
+                  className={'text-white bg-red-500 hover:brightness-110 hover:bg-red-500 font-medium w-full max-w-[12rem] p-2.5 sm:w-24'}
                 >
                   Delete
                 </AlertDialogAction>

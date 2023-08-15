@@ -33,7 +33,10 @@ export default function Menu() {
       <PopoverTrigger className={'absolute top-[22px] left-5 z-10'}>
         <CgMenuGridO className='w-6 h-6 text-gray-500' />
       </PopoverTrigger>
-      <PopoverContent onInteractOutside={(e) => e.preventDefault()} className={'ml-3 mt-3 text-sm font-medium space-y-4 w-[calc(100vw-24px)] sm:w-[280px]'}>
+      <PopoverContent
+        onInteractOutside={(e) => e.preventDefault()}
+        className='ml-3 mt-3 text-sm font-medium space-y-4 w-[calc(100vw-24px)] sm:w-[280px] backdrop-blur-lg bg-white/80'
+      >
         <Link
           href='/'
           className='text-white bg-orange-500 hover:brightness-110 hover:bg-orange-500 rounded-md font-medium pl-2.5 pr-3.5 py-2 inline-flex items-center gap-1'

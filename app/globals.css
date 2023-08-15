@@ -344,6 +344,10 @@
   padding: 6px 15px 6px 68px;
 }
 
+.mapboxgl-ctrl-geocoder--input:focus {
+  outline: none;
+}
+
 .mapboxgl-ctrl-geocoder--icon-search {
   top: 10px;
   left: 36px;

@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import PinIcon from '@/components/ui/pin-icon';
 import Menu from '@/app/user/[id]/Menu';
 import { useWindowSize } from '@/lib/useWindowSize';
+import Search from '@/components/Search';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({
@@ -89,7 +90,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
           cursor={cursor}
           onClick={handleMapClick}
         >
-          <GeocoderControl mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX} position='top-left' />
+          {/* <GeocoderControl mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX} position='top-left' /> */}
           {newPin && (
             <Marker
               latitude={newPin.latitude}
@@ -116,7 +117,8 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
           ))}
         </Map>
       </div>
-      <Menu user={user} />
+      <Search />
+      {/* <Menu user={user} /> */}
       <AnimatePresence>
         {drawer.isOpen && (
           <motion.div
