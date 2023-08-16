@@ -33,7 +33,7 @@ export default function Search() {
         className='px-10 py-3 h-auto focus-visible:ring-0 focus-visible:ring-offset-0'
       />
       <ul className=''>
-        {data?.features.map((i) => (
+        {data?.features.map((i: any) => (
           <li key={i.id}>{i.place_name}</li>
         ))}
       </ul>
