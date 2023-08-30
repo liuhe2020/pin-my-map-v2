@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 
-export interface PinValues {
+export type PinValues = {
   location: string;
   city?: string;
   region?: string;
@@ -10,7 +10,12 @@ export interface PinValues {
   id?: string;
   latitude: number;
   longitude: number;
-}
+};
+
+export type DrawerAtom = {
+  isOpen: boolean;
+  state: 'details' | 'create' | 'edit';
+};
 
 const userWithPins = Prisma.validator<Prisma.UserDefaultArgs>()({
   include: {

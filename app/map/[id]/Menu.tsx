@@ -21,12 +21,13 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAtom } from 'jotai';
 import { menuAtom } from '@/lib/atoms';
+import { env } from '@/env.mjs';
 
 export default function Menu() {
   const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
 
   const pathname = usePathname();
-  const url = `https://pinmymap.vercel.app${pathname}`;
+  const url = `${env.NEXT_PUBLIC_BASE_URL}${pathname}`;
 
   return (
     <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>

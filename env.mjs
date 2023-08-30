@@ -31,6 +31,7 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_MAPBOX: z.string().min(1),
+    NEXT_PUBLIC_BASE_URL: z.string().url(),
   },
   /*
    * Due to how Next.js bundles environment variables on Edge and Client,
@@ -56,5 +57,6 @@ export const env = createEnv({
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     NEXT_PUBLIC_MAPBOX: process.env.NEXT_PUBLIC_MAPBOX,
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
   },
 });

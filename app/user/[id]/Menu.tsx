@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import type { UserWithPins } from '../../../components/types';
+import type { UserWithPins } from '@/components/types';
 import Image from 'next/image';
 import { CgMenuGridO } from 'react-icons/cg';
 import { FaCircleUser } from 'react-icons/fa6';
@@ -23,11 +23,12 @@ import {
 import { useAtom } from 'jotai';
 import { menuAtom } from '@/lib/atoms';
 import { signOut } from 'next-auth/react';
+import { env } from '@/env.mjs';
 
 export default function Menu({ user }: { user: UserWithPins }) {
   const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
 
-  const url = `https://pinmymap.vercel.app/map/${user.id}`;
+  const url = `${env.NEXT_PUBLIC_BASE_URL}${user.id}`;
 
   return (
     <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -47,7 +48,7 @@ export default function Menu({ user }: { user: UserWithPins }) {
           {user.name && <span>{user.name}</span>}
           <Button
             onClick={() => signOut({ callbackUrl: '/' })}
-            className={'text-white bg-orange-500 hover:brightness-110 hover:bg-orange-500 font-medium w-20 p-2.5 h-9 ml-auto'}
+            className='text-white bg-orange-500 hover:brightness-110 hover:bg-orange-500 font-medium w-20 p-2.5 h-9 ml-auto'
           >
             Sign out
           </Button>
