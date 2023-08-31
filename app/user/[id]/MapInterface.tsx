@@ -90,7 +90,6 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
           cursor={cursor}
           onClick={handleMapClick}
         >
-          {/* <GeocoderControl mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX} position='top-left' /> */}
           {newPin && (
             <Marker
               latitude={newPin.latitude}
@@ -118,7 +117,6 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
         </Map>
       </div>
       <Search />
-      {/* <Menu user={user} /> */}
       <AnimatePresence>
         {drawer.isOpen && (
           <motion.div

@@ -14,6 +14,7 @@ import Menu from './Menu';
 import Drawer from './Drawer';
 import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
 import { useWindowSize } from '@/lib/useWindowSize';
+import Search from '@/components/Search';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({
@@ -67,7 +68,6 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
           cursor={cursor}
           onClick={handleMapClick}
         >
-          <GeocoderControl mapboxAccessToken={env.NEXT_PUBLIC_MAPBOX} position='top-left' />
           {user?.pins.map((pin) => (
             <Marker
               key={pin.id}
@@ -81,7 +81,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
           ))}
         </Map>
       </div>
-      <Menu />
+      <Search />
       <AnimatePresence>
         {pinDetails && (
           <motion.div
