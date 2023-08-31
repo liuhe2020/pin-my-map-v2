@@ -2,8 +2,7 @@
 
 import { ImSearch } from 'react-icons/im';
 import { Input } from './ui/input';
-import { useState } from 'react';
-import useDebounce from '@/lib/useDebounce';
+import { useRef, useState } from 'react';
 import { env } from '@/env.mjs';
 import { useQuery } from '@tanstack/react-query';
 import { menuDropdownAtom } from '@/lib/atoms';
@@ -30,6 +29,7 @@ import { Button } from './ui/button';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { BsFillCaretLeftFill } from 'react-icons/bs';
+import { useDebounce, useOnClickOutside } from 'usehooks-ts';
 
 export default function Search() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,6 +37,7 @@ export default function Search() {
   const debouncedTerm = useDebounce(searchTerm);
   const pathname = usePathname();
   const { data: session } = useSession();
+  const ref = useRef(null);
 
   const url = `${env.NEXT_PUBLIC_BASE_URL}/map/${pathname.split('/')[2]}`;
 
@@ -47,6 +48,9 @@ export default function Search() {
       setIsSearchDropdown(null);
     }
   };
+
+  // close dropdown when clicking outside or on the map
+  useOnClickOutside(ref, () => setIsSearchDropdown(null));
 
   const fetcher = async () => {
     const response = await fetch(
@@ -59,7 +63,7 @@ export default function Search() {
 
   // console.log(data);
   return (
-    <div className='fixed top-2 left-2 sm:w-72 backdrop-blur-lg shadow bg-white/80 rounded-md overflow-hidden'>
+    <div ref={ref} className='fixed top-2 left-2 sm:w-72 backdrop-blur-lg shadow bg-white/80 rounded-md overflow-hidden'>
       <div className='h-11 flex px-2.5'>
         <div className='flex items-center text-gray-500 gap-2'>
           <CgMenuGridO className='w-6 h-6 cursor-pointer' onClick={handleMenuClick} />

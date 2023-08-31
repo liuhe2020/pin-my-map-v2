@@ -3,18 +3,16 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import React, { useCallback, useRef, useState } from 'react';
 import Map, { Marker, type MapRef } from 'react-map-gl';
-import GeocoderControl from '@/components/GeocoderControl';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { PinWithPhotos, UserWithPins } from '@/components/types';
 import { menuAtom, pinDetailsAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import { env } from '@/env.mjs';
 import PinIcon from '@/components/ui/pin-icon';
-import Menu from './Menu';
 import Drawer from './Drawer';
 import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
-import { useWindowSize } from '@/lib/useWindowSize';
 import Search from '@/components/Search';
+import { useWindowSize } from 'usehooks-ts';
 
 export default function MapInterface({ user }: { user: UserWithPins }) {
   const [viewState, setViewState] = useState({
