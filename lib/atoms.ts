@@ -7,8 +7,6 @@ const newPinAtom = atom<Pick<PinValues, 'latitude' | 'longitude'> | null>(null);
 
 const drawerAtom = atom<DrawerAtom>({ isOpen: false, state: 'details' });
 
-const menuAtom = atom<boolean>(false);
+const dropdownAtom = atom<null | 'search' | 'menu'>(null);
 
-const menuDropdownAtom = atom<null | 'search' | 'menu'>(null);
-
-export { pinDetailsAtom, newPinAtom, drawerAtom, menuAtom, menuDropdownAtom };
+export { pinDetailsAtom, newPinAtom, drawerAtom, dropdownAtom };

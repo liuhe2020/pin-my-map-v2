@@ -6,7 +6,7 @@ import Map, { Marker, type MapLayerMouseEvent, type MapRef } from 'react-map-gl'
 import { AnimatePresence, motion } from 'framer-motion';
 import type { PinWithPhotos, UserWithPins } from '@/components/types';
 import Drawer from './Drawer';
-import { pinDetailsAtom, drawerAtom, newPinAtom, menuAtom } from '@/lib/atoms';
+import { pinDetailsAtom, drawerAtom, newPinAtom, dropdownAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import type { MarkerEvent } from 'react-map-gl/dist/esm/types';
 import { env } from '@/env.mjs';
@@ -24,15 +24,15 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
   const [cursor, setCursor] = useState('default');
   const [newPin, setNewPin] = useAtom(newPinAtom);
   const [drawer, setDrawer] = useAtom(drawerAtom);
-  const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
   const [, setPinDetails] = useAtom(pinDetailsAtom);
+  const [dropDown, setDropdown] = useAtom(dropdownAtom);
   const { width: windowWidth } = useWindowSize();
 
   const mapRef = useRef<MapRef>(null);
 
   const handleMapClick = async (e: MapLayerMouseEvent) => {
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
+    if (dropDown) {
+      setDropdown(null); // close search/menu dropdown if open
       return;
     }
     if (!drawer.isOpen) {
@@ -56,10 +56,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
 
   const handlePinClick = (e: MarkerEvent<mapboxgl.Marker, globalThis.MouseEvent>, pin: PinWithPhotos) => {
     e.originalEvent.stopPropagation(); // stop add pin firing on existing pins
-    if (isMenuOpen) {
-      setIsMenuOpen(false); // stop drawer open if menu is open
-      return;
-    }
+    if (dropDown) setDropdown(null);
     if (newPin && drawer.isOpen === true) return;
     if (drawer.isOpen && drawer.state === 'edit') return;
     setNewPin(null);
@@ -114,7 +111,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
           ))}
         </Map>
       </div>
-      <Search />
+      <Search mapRef={mapRef} />
       <AnimatePresence>
         {drawer.isOpen && (
           <motion.div

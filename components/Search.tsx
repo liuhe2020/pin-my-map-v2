@@ -5,7 +5,7 @@ import { Input } from './ui/input';
 import { useRef, useState } from 'react';
 import { env } from '@/env.mjs';
 import { useQuery } from '@tanstack/react-query';
-import { menuDropdownAtom } from '@/lib/atoms';
+import { dropdownAtom, newPinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import { CgMenuGridO } from 'react-icons/cg';
 import { signOut, useSession } from 'next-auth/react';
@@ -29,15 +29,16 @@ import { Button } from './ui/button';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { BsFillCaretLeftFill } from 'react-icons/bs';
-import { useDebounce, useOnClickOutside } from 'usehooks-ts';
+import { useDebounce } from 'usehooks-ts';
+import type { MapRef } from 'react-map-gl';
 
-export default function Search() {
+export default function Search({ mapRef }: { mapRef: React.RefObject<MapRef> }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [isSearchDropdown, setIsSearchDropdown] = useAtom(menuDropdownAtom);
+  const [isSearchDropdown, setIsSearchDropdown] = useAtom(dropdownAtom);
+  const [, setNewPin] = useAtom(newPinAtom);
   const debouncedTerm = useDebounce(searchTerm);
   const pathname = usePathname();
   const { data: session } = useSession();
-  const ref = useRef(null);
 
   const url = `${env.NEXT_PUBLIC_BASE_URL}/map/${pathname.split('/')[2]}`;
 
@@ -49,8 +50,10 @@ export default function Search() {
     }
   };
 
-  // close dropdown when clicking outside or on the map
-  useOnClickOutside(ref, () => setIsSearchDropdown(null));
+  const handleSearchClick = (i: any) => {
+    setNewPin({ latitude: i.center[1], longitude: i.center[0] });
+    mapRef.current?.flyTo({ center: i.center });
+  };
 
   const fetcher = async () => {
     const response = await fetch(
@@ -63,7 +66,7 @@ export default function Search() {
 
   // console.log(data);
   return (
-    <div ref={ref} className='fixed top-2 left-2 sm:w-72 backdrop-blur-lg shadow bg-white/80 rounded-md overflow-hidden'>
+    <div className='fixed top-2 left-2 sm:w-72 backdrop-blur-lg shadow bg-white/80 rounded-md overflow-hidden'>
       <div className='h-11 flex px-2.5'>
         <div className='flex items-center text-gray-500 gap-2'>
           <CgMenuGridO className='w-6 h-6 cursor-pointer' onClick={handleMenuClick} />
@@ -83,7 +86,7 @@ export default function Search() {
       <ul className='border-t'>
         {isSearchDropdown === 'search' &&
           data?.features.map((i: any) => (
-            <li key={i.id} className='text-sm cursor-pointer px-3.5 py-1.5 first:pt-3 last:pb-3 hover:bg-gray-200'>
+            <li key={i.id} className='text-sm cursor-pointer px-3.5 py-1.5 first:pt-3 last:pb-3 hover:bg-gray-200' onClick={() => handleSearchClick(i)}>
               <p className='font-medium overflow-hidden whitespace-nowrap text-ellipsis'>{i.place_name.split(',')[0]}</p>
               <p className='overflow-hidden whitespace-nowrap text-ellipsis'>{i.place_name.substring(i.place_name.indexOf(',') + 1).trim()}</p>
             </li>

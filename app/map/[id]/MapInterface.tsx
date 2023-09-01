@@ -5,7 +5,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import Map, { Marker, type MapRef } from 'react-map-gl';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { PinWithPhotos, UserWithPins } from '@/components/types';
-import { menuAtom, pinDetailsAtom } from '@/lib/atoms';
+import { dropdownAtom, pinDetailsAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import { env } from '@/env.mjs';
 import PinIcon from '@/components/ui/pin-icon';
@@ -22,15 +22,15 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
   });
   const [cursor, setCursor] = useState('default');
   const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
-  const [isMenuOpen, setIsMenuOpen] = useAtom(menuAtom);
+  const [dropDown, setDropdown] = useAtom(dropdownAtom);
   const { width: windowWidth } = useWindowSize();
 
   const mapRef = useRef<MapRef>(null);
 
   // create a new marker at clicked location
   const handleMapClick = async () => {
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
+    if (dropDown) {
+      setDropdown(null); // close search/menu dropdown if open
       return;
     }
     if (pinDetails) setPinDetails(null);
@@ -38,10 +38,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
 
   const handlePinClick = (e: MarkerEvent<mapboxgl.Marker, globalThis.MouseEvent>, pin: PinWithPhotos) => {
     e.originalEvent.stopPropagation(); // stop handleMapClick firing
-    if (isMenuOpen) {
-      setIsMenuOpen(false); // stop drawer open if menu is open
-      return;
-    }
+    if (dropDown) setDropdown(null);
     setPinDetails(pin);
     windowWidth && windowWidth >= 640 && mapRef.current?.easeTo({ center: [pin.longitude, pin.latitude], offset: [-240, 0] });
   };
@@ -79,7 +76,7 @@ export default function MapInterface({ user }: { user: UserWithPins }) {
           ))}
         </Map>
       </div>
-      <Search />
+      <Search mapRef={mapRef} />
       <AnimatePresence>
         {pinDetails && (
           <motion.div
