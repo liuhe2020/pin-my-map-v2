@@ -33,18 +33,20 @@ export default function HomePage() {
                     <span>Sign in with Google</span>
                   </>
                 )}
-                <Oval
-                  height={18}
-                  width={18}
-                  color='#fff'
-                  wrapperStyle={{}}
-                  wrapperClass=''
-                  visible={status === 'loading'}
-                  ariaLabel='oval-loading'
-                  secondaryColor='#fff'
-                  strokeWidth={8}
-                  strokeWidthSecondary={8}
-                />
+                <div className='py-0.5'>
+                  <Oval
+                    height={20}
+                    width={20}
+                    color='#fff'
+                    wrapperStyle={{}}
+                    wrapperClass=''
+                    visible={status === 'loading'}
+                    ariaLabel='oval-loading'
+                    secondaryColor='#fff'
+                    strokeWidth={8}
+                    strokeWidthSecondary={8}
+                  />
+                </div>
               </button>
             )}
             {session && (
