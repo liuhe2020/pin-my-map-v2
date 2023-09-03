@@ -27,6 +27,7 @@ import Overlay from '@/components/ui/overlay';
 
 export default function EditPin() {
   const [files, setFiles] = useState<string[]>([]);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [, setDrawer] = useAtom(drawerAtom);
   const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
   const [deletePhotos, setDeletePhotos] = useState<string[]>([]);
@@ -154,7 +155,7 @@ export default function EditPin() {
             render={({ field }) => (
               <FormItem className='flex flex-col'>
                 <FormLabel>Date</FormLabel>
-                <Popover>
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button variant={'outline'} className={cn('justify-start text-left font-normal', !field.value && 'text-muted-foreground')}>
@@ -167,7 +168,10 @@ export default function EditPin() {
                     <Calendar
                       mode='single'
                       selected={field.value}
-                      onSelect={field.onChange}
+                      onSelect={(e) => {
+                        field.onChange(e);
+                        setIsCalendarOpen(false);
+                      }}
                       disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
                       initialFocus
                       captionLayout='dropdown-buttons'

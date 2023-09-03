@@ -60,7 +60,7 @@ export default function HomePage() {
             )}
             <Link
               className='flex justify-center items-center gap-x-2 text-white bg-indigo-500 hover:brightness-110 font-semibold rounded-lg p-3.5 focus:outline-none w-full mx-auto lg:mx-0 text-center shadow-neutral-300 shadow-md'
-              href='/maps/1'
+              href='/map/demo'
             >
               <FaMapMarkedAlt className='w-4 h-4' />
               <span>View demo</span>
