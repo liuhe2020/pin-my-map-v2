@@ -1,7 +1,6 @@
 import './globals.css';
 import { Inter } from 'next/font/google';
 import NextAuthSessionProvider from '@/components/NextAuthSessionProvider';
-import JotaiProvider from '@/components/JotaiProvider';
 import ReactQueryProvider from '@/components/ReactQueryProvider';
 
 const inter = Inter({ subsets: ['latin'] });
