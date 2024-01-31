@@ -176,35 +176,35 @@ export default function CreatePin() {
             render={({ field }) => (
               <FormItem className='flex flex-col'>
                 <FormLabel>Date</FormLabel>
-                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                  <PopoverTrigger asChild>
-                    <FormControl>
+                <FormControl>
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                    <PopoverTrigger asChild>
                       <Button variant={'outline'} className={cn('justify-start text-left font-normal', !field.value && 'text-muted-foreground')}>
                         <CalendarIcon className='mr-2 h-4 w-4' />
                         {field.value ? format(field.value, 'd MMMM yyyy') : <span>Pick a date</span>}
                       </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-auto p-0' align='start'>
-                    <Calendar
-                      mode='single'
-                      selected={field.value}
-                      onSelect={(e) => {
-                        field.onChange(e);
-                        setIsCalendarOpen(false);
-                      }}
-                      disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                      initialFocus
-                      captionLayout='dropdown-buttons'
-                      fromDate={new Date(new Date().getFullYear() - 100, new Date().getMonth(), new Date().getDate())}
-                      toDate={new Date()}
-                      classNames={{
-                        day_selected:
-                          'bg-indigo-500 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-indigo-500 focus:text-primary-foreground',
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0' align='start'>
+                      <Calendar
+                        mode='single'
+                        selected={field.value}
+                        onSelect={(e) => {
+                          field.onChange(e);
+                          setIsCalendarOpen(false);
+                        }}
+                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                        initialFocus
+                        captionLayout='dropdown-buttons'
+                        fromDate={new Date(new Date().getFullYear() - 100, new Date().getMonth(), new Date().getDate())}
+                        toDate={new Date()}
+                        classNames={{
+                          day_selected:
+                            'bg-indigo-500 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-indigo-500 focus:text-primary-foreground',
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
