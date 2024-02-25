@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { dropdownAtom, newPinAtom } from '@/lib/atoms';
 import { useAtom } from 'jotai';
 import { CgMenuGridO } from 'react-icons/cg';
-import { signOut, useSession } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 import {
   FacebookShareButton,
   LinkedinShareButton,
@@ -29,15 +29,14 @@ import { Button } from './ui/button';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { BsFillCaretLeftFill } from 'react-icons/bs';
-import { useDebounceCallback } from 'usehooks-ts';
+import { useDebounceValue } from 'usehooks-ts';
 import type { MapRef } from 'react-map-gl';
 import { type Session } from 'next-auth';
 
 export default function Search({ mapRef, session }: { mapRef: React.RefObject<MapRef>; session: Session | null }) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedValue, setValue] = useDebounceValue('', 500);
   const [isSearchDropdown, setIsSearchDropdown] = useAtom(dropdownAtom);
   const [, setNewPin] = useAtom(newPinAtom);
-  const debouncedTerm = useDebounceCallback(setSearchTerm, 500);
   const pathname = usePathname();
 
   const url = `${env.NEXT_PUBLIC_BASE_URL}/map/${pathname.split('/')[2]}`;
@@ -57,12 +56,12 @@ export default function Search({ mapRef, session }: { mapRef: React.RefObject<Ma
 
   const fetcher = async () => {
     const response = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${debouncedTerm}.json?fuzzyMatch=true&limit=10&proximity=ip&access_token=${env.NEXT_PUBLIC_MAPBOX}`
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${debouncedValue}.json?fuzzyMatch=true&limit=10&proximity=ip&access_token=${env.NEXT_PUBLIC_MAPBOX}`
     );
     return await response.json();
   };
 
-  const { data } = useQuery(['search', debouncedTerm], fetcher);
+  const { data } = useQuery(['search', debouncedValue], fetcher, { enabled: !!debouncedValue.length });
 
   return (
     <div className='fixed top-2 left-2 sm:w-72 backdrop-blur-lg shadow bg-white/80 rounded-md overflow-hidden'>
@@ -74,10 +73,9 @@ export default function Search({ mapRef, session }: { mapRef: React.RefObject<Ma
         <Input
           onChange={(e) => {
             setIsSearchDropdown('search');
-            setSearchTerm(e.target.value);
+            setValue(e.target.value);
           }}
-          type='text'
-          value={searchTerm}
+          type='search'
           placeholder='Search'
           className='px-2 py-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent font-medium border-none'
         />
