@@ -3,9 +3,9 @@
 import { useAtom } from 'jotai';
 import { drawerAtom } from '@/lib/atoms';
 import { VscChromeClose } from 'react-icons/vsc';
-import PinDetails from './PinDetails';
-import EditPin from './EditPin';
-import CreatePin from './CreatePin';
+import PinDetails from './pin-details';
+import EditPin from './edit-pin';
+import CreatePin from './create-pin';
 import {
   AlertDialog,
   AlertDialogAction,

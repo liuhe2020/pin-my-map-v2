@@ -1,6 +1,8 @@
 import prisma from '@/lib/prisma';
-import MapInterface from './MapInterface';
+import MapInterface from './map-interface';
 import { notFound } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-options';
 
 export async function generateStaticParams() {
   const users = await prisma.user.findMany();
@@ -27,5 +29,7 @@ export default async function UserMapPage({ params: { id } }: { params: { id: st
 
   if (!user) return notFound();
 
-  return <MapInterface user={user} />;
+  const session = await getServerSession(authOptions);
+
+  return <MapInterface user={user} session={session} />;
 }

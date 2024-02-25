@@ -17,35 +17,51 @@ import { useDropzone, type FileWithPath } from 'react-dropzone';
 import Image from 'next/image';
 import { AiFillMinusCircle } from 'react-icons/ai';
 import { BiSolidCloudUpload } from 'react-icons/bi';
-import { useAtom } from 'jotai';
-import { drawerAtom, pinDetailsAtom } from '@/lib/atoms';
-import { formSchema } from '@/lib/formSchema';
+import { useAtom, useAtomValue } from 'jotai';
+import { drawerAtom, newPinAtom, pinDetailsAtom } from '@/lib/atoms';
+import { useQuery } from '@tanstack/react-query';
+import { env } from '@/env.mjs';
+import { createPinAction } from '@/app/actions';
+import { formSchema } from '@/lib/form-schema';
 import { useRouter } from 'next/navigation';
-import { editPinAction } from '@/app/actions';
-import { AnimatePresence } from 'framer-motion';
 import Overlay from '@/components/ui/overlay';
+import { AnimatePresence } from 'framer-motion';
 
-export default function EditPin() {
+export default function CreatePin() {
   const [files, setFiles] = useState<string[]>([]);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const newPin = useAtomValue(newPinAtom);
   const [, setDrawer] = useAtom(drawerAtom);
-  const [pinDetails, setPinDetails] = useAtom(pinDetailsAtom);
-  const [deletePhotos, setDeletePhotos] = useState<string[]>([]);
+  const [, setPinDetails] = useAtom(pinDetailsAtom);
+  const [, setNewPin] = useAtom(newPinAtom);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      location: pinDetails?.location,
-      city: pinDetails?.city ?? '',
-      region: pinDetails?.region ?? '',
-      country: pinDetails?.country ?? '',
-      date: pinDetails?.date ?? undefined,
-      description: pinDetails?.description ?? '',
+  // fetch api for mapbox geocoder api for react-query
+  const fetcher = async () => {
+    const response = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${newPin?.longitude},${newPin?.latitude}.json?access_token=${env.NEXT_PUBLIC_MAPBOX}`
+    );
+    return await response.json();
+  };
+
+  // get location detail from mapbox geocoder api
+  const { data, isLoading: isNewPinLoading } = useQuery(['place'], fetcher, {
+    onSuccess: (place) => {
+      // change default value of form once available from api fetch
+      const location =
+        place.features.find((i: { id: string }) => i.id.includes('poi'))?.text ||
+        place.features.find((i: { id: string }) => i.id.includes('neighborhood'))?.text ||
+        place.features.find((i: { id: string }) => i.id.includes('locality'))?.text ||
+        '';
+      const city = place.features.find((i: { id: string }) => i.id.includes('place'))?.text || '';
+      const region = place.features.find((i: { id: string }) => i.id.includes('region'))?.text || '';
+      const country = place.features.find((i: { id: string }) => i.id.includes('country'))?.text || '';
+      form.reset({ location, city, region, country });
     },
   });
 
+  // react-dropzone
   const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
     acceptedFiles.forEach((file) => {
       const reader = new FileReader();
@@ -64,30 +80,35 @@ export default function EditPin() {
     },
   });
 
-  const handleRemoveExsistingPhoto = (e: MouseEvent, id: string) => {
-    e.stopPropagation();
-    if (pinDetails && pinDetails.photos.length > 0) {
-      const pinDetailsWithPhotosRemoved = { ...pinDetails, photos: pinDetails.photos.filter((photo) => photo.id !== id) };
-      setPinDetails(pinDetailsWithPhotosRemoved);
-      setDeletePhotos((prev) => [...prev, id]);
-    }
-  };
-
   const handleRemovePhoto = (e: MouseEvent, index: number) => {
     e.stopPropagation();
     const filteredFiles = files.filter((i, idx) => idx !== index);
     setFiles(filteredFiles);
   };
 
+  // react-hook-form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      location: '',
+      city: '',
+      region: '',
+      country: '',
+      date: undefined,
+      description: '',
+    },
+  });
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (pinDetails) {
-      const pin = { ...values, id: pinDetails.id };
+    if (newPin) {
+      const pin = { ...values, latitude: newPin.latitude, longitude: newPin.longitude };
       // server action
       startTransition(async () => {
-        const response = await editPinAction(pin, deletePhotos, files);
+        const response = await createPinAction(pin, files);
         if (!response || !response.data || response.error) return alert('ERROR');
         setPinDetails(response.data);
         setDrawer((prev) => ({ ...prev, state: 'details' }));
+        setNewPin(null);
         router.refresh();
       });
     }
@@ -155,35 +176,35 @@ export default function EditPin() {
             render={({ field }) => (
               <FormItem className='flex flex-col'>
                 <FormLabel>Date</FormLabel>
-                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                  <PopoverTrigger asChild>
-                    <FormControl>
+                <FormControl>
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                    <PopoverTrigger asChild>
                       <Button variant={'outline'} className={cn('justify-start text-left font-normal', !field.value && 'text-muted-foreground')}>
                         <CalendarIcon className='mr-2 h-4 w-4' />
                         {field.value ? format(field.value, 'd MMMM yyyy') : <span>Pick a date</span>}
                       </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-auto p-0' align='start'>
-                    <Calendar
-                      mode='single'
-                      selected={field.value}
-                      onSelect={(e) => {
-                        field.onChange(e);
-                        setIsCalendarOpen(false);
-                      }}
-                      disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                      initialFocus
-                      captionLayout='dropdown-buttons'
-                      fromDate={new Date(new Date().getFullYear() - 100, new Date().getMonth(), new Date().getDate())}
-                      toDate={new Date()}
-                      classNames={{
-                        day_selected:
-                          'bg-indigo-500 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-indigo-500 focus:text-primary-foreground',
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-auto p-0' align='start'>
+                      <Calendar
+                        mode='single'
+                        selected={field.value}
+                        onSelect={(e) => {
+                          field.onChange(e);
+                          setIsCalendarOpen(false);
+                        }}
+                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                        initialFocus
+                        captionLayout='dropdown-buttons'
+                        fromDate={new Date(new Date().getFullYear() - 100, new Date().getMonth(), new Date().getDate())}
+                        toDate={new Date()}
+                        classNames={{
+                          day_selected:
+                            'bg-indigo-500 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-indigo-500 focus:text-primary-foreground',
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -212,36 +233,22 @@ export default function EditPin() {
               >
                 {/* <input {...getInputProps()} /> */}
                 <div className={cn(isDragActive && 'bg-white/50 blur opacity-50', 'transition-all duration-400')}>
-                  {((pinDetails && pinDetails.photos.length > 0) || files.length > 0) && (
+                  {files.length > 0 && (
                     <div className='grid grid-cols-2 sm:grid-cols-3 p-6 gap-6'>
-                      {pinDetails &&
-                        pinDetails.photos.length > 0 &&
-                        pinDetails.photos.map((photo, index) => (
-                          <div key={index} className='relative'>
-                            <div className='relative'>
-                              <Image src={photo.url} alt='preview' width={120} height={120} className='w-full aspect-square object-cover rounded-md' />
-                            </div>
-                            <AiFillMinusCircle
-                              className='absolute -top-3 -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
-                              onClick={(e) => handleRemoveExsistingPhoto(e, photo.id)}
-                            />
+                      {files.map((file, index) => (
+                        <div key={index} className='relative'>
+                          <div className='relative'>
+                            <Image src={file} alt='preview' width={120} height={120} className='w-full aspect-square object-cover rounded-md' />
                           </div>
-                        ))}
-                      {files.length > 0 &&
-                        files.map((file, index) => (
-                          <div key={index} className='relative'>
-                            <div className='relative'>
-                              <Image src={file} alt='preview' width={120} height={120} className='w-full aspect-square object-cover rounded-md' />
-                            </div>
-                            <AiFillMinusCircle
-                              className='absolute -top-3 -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
-                              onClick={(e) => handleRemovePhoto(e, index)}
-                            />
-                          </div>
-                        ))}
+                          <AiFillMinusCircle
+                            className='absolute -top-3 -right-3 w-6 h-6 cursor-pointer transition-transform duration-150 hover:scale-110'
+                            onClick={(e) => handleRemovePhoto(e, index)}
+                          />
+                        </div>
+                      ))}
                     </div>
                   )}
-                  {pinDetails?.photos.length === 0 && files.length === 0 && (
+                  {files.length === 0 && (
                     <div className='flex flex-col items-center gap-y-2 my-auto px-4'>
                       <p className='text-sm text-center font-medium'>Click to select photos, or drag and drop here</p>
                       <BiSolidCloudUpload className='w-6 h-6 text-indigo-500' />
@@ -251,7 +258,7 @@ export default function EditPin() {
               </div>
             </div>
           </div>
-          <Button type='submit' className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}>
+          <Button type='submit' disabled={isPending} className={'w-24 bg-indigo-500 hover:bg-indigo-500 hover:brightness-110'}>
             Submit
           </Button>
         </form>

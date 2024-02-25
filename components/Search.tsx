@@ -2,7 +2,7 @@
 
 import { ImSearch } from 'react-icons/im';
 import { Input } from './ui/input';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { env } from '@/env.mjs';
 import { useQuery } from '@tanstack/react-query';
 import { dropdownAtom, newPinAtom } from '@/lib/atoms';
@@ -29,16 +29,16 @@ import { Button } from './ui/button';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { BsFillCaretLeftFill } from 'react-icons/bs';
-import { useDebounce } from 'usehooks-ts';
+import { useDebounceCallback } from 'usehooks-ts';
 import type { MapRef } from 'react-map-gl';
+import { type Session } from 'next-auth';
 
-export default function Search({ mapRef }: { mapRef: React.RefObject<MapRef> }) {
+export default function Search({ mapRef, session }: { mapRef: React.RefObject<MapRef>; session: Session | null }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchDropdown, setIsSearchDropdown] = useAtom(dropdownAtom);
   const [, setNewPin] = useAtom(newPinAtom);
-  const debouncedTerm = useDebounce(searchTerm);
+  const debouncedTerm = useDebounceCallback(setSearchTerm, 500);
   const pathname = usePathname();
-  const { data: session } = useSession();
 
   const url = `${env.NEXT_PUBLIC_BASE_URL}/map/${pathname.split('/')[2]}`;
 
@@ -64,7 +64,6 @@ export default function Search({ mapRef }: { mapRef: React.RefObject<MapRef> }) 
 
   const { data } = useQuery(['search', debouncedTerm], fetcher);
 
-  // console.log(data);
   return (
     <div className='fixed top-2 left-2 sm:w-72 backdrop-blur-lg shadow bg-white/80 rounded-md overflow-hidden'>
       <div className='h-11 flex px-2.5'>

@@ -12,7 +12,7 @@ import prisma from '@/lib/prisma';
 import type { PinValues } from '@/components/types';
 import { env } from '@/env.mjs';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/authOptions';
+import { authOptions } from '@/lib/auth-options';
 
 export async function createPinAction(pin: PinValues, files: string[]) {
   const session = await getServerSession(authOptions);

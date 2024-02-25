@@ -1,8 +1,8 @@
 import prisma from '@/lib/prisma';
-import MapInterface from './MapInterface';
+import MapInterface from './map-interface';
 import { notFound } from 'next/navigation';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/authOptions';
+import { authOptions } from '@/lib/auth-options';
 import { redirect } from 'next/navigation';
 
 // export async function generateStaticParams() {
@@ -34,5 +34,5 @@ export default async function UserMapPage({ params: { id } }: { params: { id: st
 
   if (!session || session?.user?.id !== id) redirect('/');
 
-  return <MapInterface user={user} />;
+  return <MapInterface user={user} session={session} />;
 }
