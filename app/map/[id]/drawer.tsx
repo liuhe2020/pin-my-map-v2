@@ -34,7 +34,7 @@ export default function Drawer() {
 
   return (
     <>
-      <div className='p-4 sm:p-6 flex flex-col gap-y-6'>
+      <div className='p-4 sm:p-6 flex flex-col gap-y-6 relative'>
         <div className='flex justify-end'>
           <VscChromeClose className='w-6 h-6 cursor-pointer' onClick={handleDrawerClose} />
         </div>
